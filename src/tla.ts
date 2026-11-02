@@ -1,5 +1,5 @@
 /*
- * tla-rxjs-svg/tla: the checking half. Runs tla-ts on a config and converts
+ * rxjs-trace-viewer/tla: the checking half. Runs tla-ts on a config and converts
  * its values. Needs Node and tla-ts.
  */
 

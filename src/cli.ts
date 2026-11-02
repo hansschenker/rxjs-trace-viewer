@@ -15,11 +15,11 @@ import type { TraceFile } from "./trace-file.ts";
 
 /*
  * Usage:
- *   tla-rxjs-svg trace          [cfg ...]   check with tla-ts, write traces/<cfg>.json
- *   tla-rxjs-svg render         [cfg ...]   read traces/<cfg>.json, write out/<cfg>.html
- *   tla-rxjs-svg animate        [cfg ...]   both
- *   tla-rxjs-svg render-runtime [name ...]  read traces/runtime/<name>.json, write out/runtime/<name>.html
- *   tla-rxjs-svg gallery                    every trace and recording on one page: out/gallery.html
+ *   rxjs-trace-viewer trace          [cfg ...]   check with tla-ts, write traces/<cfg>.json
+ *   rxjs-trace-viewer render         [cfg ...]   read traces/<cfg>.json, write out/<cfg>.html
+ *   rxjs-trace-viewer animate        [cfg ...]   both
+ *   rxjs-trace-viewer render-runtime [name ...]  read traces/runtime/<name>.json, write out/runtime/<name>.html
+ *   rxjs-trace-viewer gallery                    every trace and recording on one page: out/gallery.html
  * Options:
  *   --specs <dir>    where the .tla, .cfg and manifest.json live
  *                    (default: ../rxjs-operator-tla/specs next to this package)

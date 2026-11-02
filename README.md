@@ -1,6 +1,6 @@
 # RxJS Trace Viewer
 
-`tla-rxjs-svg`: one frame per state, adapting the TLA+ Animation module to an
+`rxjs-trace-viewer`: one frame per state, adapting the TLA+ Animation module to an
 RxJS state tracing animation tool.
 
 This repository holds the design note that came out of reading Will Schultz's
@@ -54,8 +54,8 @@ click a step in the list. `trace` and `render` run the two halves alone.
 
 | File | Role |
 |---|---|
-| `src/index.ts` | the core entry, `tla-rxjs-svg`: browser-safe, no Node or tla-ts |
-| `src/tla.ts` | the checking entry, `tla-rxjs-svg/tla`: Node and tla-ts |
+| `src/index.ts` | the core entry, `rxjs-trace-viewer`: browser-safe, no Node or tla-ts |
+| `src/tla.ts` | the checking entry, `rxjs-trace-viewer/tla`: Node and tla-ts |
 | `src/values.ts` | `JsValue`, a TLA+ value as plain JavaScript |
 | `src/trace-file.ts` | `TraceFile`, the shape of `traces/<cfg>.json` |
 | `src/trace.ts` | `runTrace`: tla-ts `check()` to a `TraceFile`, VARIABLES in declaration order |
@@ -99,8 +99,8 @@ events.
 Two entry points, so a page can render frames without the checker:
 
 ```ts
-import { runTrace } from "tla-rxjs-svg/tla"; // Node + tla-ts: check a config
-import { renderTrace, fromTlaTrace } from "tla-rxjs-svg"; // browser-safe
+import { runTrace } from "rxjs-trace-viewer/tla"; // Node + tla-ts: check a config
+import { renderTrace, fromTlaTrace } from "rxjs-trace-viewer"; // browser-safe
 
 const file = await runTrace("../rxjs-operator-tla/specs", "Flatten_bug_mergeForSwitch.cfg");
 const { html, frames, set } = renderTrace(file); // page, SVG frames, FrameState[]
@@ -338,21 +338,21 @@ the action, not the action itself.
 
 ## Roadmap
 
-1. **[M1 SVG frames over tla-ts traces](https://github.com/hansschenker/tla-rxjs-svg/milestone/1).** Extend `trace-to-marble.mjs` with a frame
+1. **[M1 SVG frames over tla-ts traces](https://github.com/hansschenker/rxjs-trace-viewer/milestone/1).** Extend `trace-to-marble.mjs` with a frame
    renderer and a ported stepper page. Animate the four bug demos in the specs
    manifest: mergeMap where switchMap was intended, the concatMap stall, the
    shareReplay leak and the combineLatest hang.
-2. **[M2 Extract the frame type and the model adapter](https://github.com/hansschenker/tla-rxjs-svg/milestone/2)** into this repository as a
+2. **[M2 Extract the frame type and the model adapter](https://github.com/hansschenker/rxjs-trace-viewer/milestone/2)** into this repository as a
    package, with Vitest tests on the adapter against fixture traces.
-3. **[M3 Runtime adapter](https://github.com/hansschenker/tla-rxjs-svg/milestone/3).** `fromExecutionTrace` as a `scan` over `ExecutionEvent[]`,
+3. **[M3 Runtime adapter](https://github.com/hansschenker/rxjs-trace-viewer/milestone/3).** `fromExecutionTrace` as a `scan` over `ExecutionEvent[]`,
    reusing lane classification from the `rxotn` package, inner lanes from parent
    links.
-4. **[M4 Animator components](https://github.com/hansschenker/tla-rxjs-svg/milestone/4).** A framework-less JSX component for rxjs-ds and a
+4. **[M4 Animator components](https://github.com/hansschenker/rxjs-trace-viewer/milestone/4).** A framework-less JSX component for rxjs-ds and a
    matching Vue component for rxjs-vitepress-ds, so operator documentation pages
    can embed an animated counterexample.
-5. **[M5 Model beside runtime](https://github.com/hansschenker/tla-rxjs-svg/milestone/5).** Play a spec counterexample and a `TestScheduler`
+5. **[M5 Model beside runtime](https://github.com/hansschenker/rxjs-trace-viewer/milestone/5).** Play a spec counterexample and a `TestScheduler`
    recording of the same scenario in two synchronised steppers.
-6. **[M6 Interactive exploration](https://github.com/hansschenker/tla-rxjs-svg/milestone/6).** Blocked on a step or evaluate API from tla-ts for
+6. **[M6 Interactive exploration](https://github.com/hansschenker/rxjs-trace-viewer/milestone/6).** Blocked on a step or evaluate API from tla-ts for
    the model track; available sooner on the runtime track through the scheduler.
 
 ## Sources

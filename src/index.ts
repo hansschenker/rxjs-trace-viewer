@@ -1,7 +1,7 @@
 /*
- * tla-rxjs-svg, the core: frame state, the two adapters, the View and the
+ * rxjs-trace-viewer, the core: frame state, the two adapters, the View and the
  * playback page. No dependency on Node or tla-ts, so it can run in a
- * browser. Checking a spec lives in the `tla-rxjs-svg/tla` entry.
+ * browser. Checking a spec lives in the `rxjs-trace-viewer/tla` entry.
  */
 
 export type { JsRecord, JsValue } from "./values.ts";

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>tla-rxjs-svg</title>
+<title>RxJS Trace Viewer Design Note</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
   :root {
@@ -226,7 +226,7 @@
 <body>
 <div class="page">
 <header>
-  <div class="eyebrow">Design note &middot; 2 November 2026 &middot; hansschenker/tla-rxjs-svg</div>
+  <div class="eyebrow">Design note &middot; 2 November 2026 &middot; hansschenker/rxjs-trace-viewer</div>
   <h1>One frame per state: adapting the TLA+ Animation module to RxJS</h1>
   <p class="thesis">A trace is a sequence of states. A view is a pure function from a state to a picture. An animation is one frame per state. That is the entire idea behind Will Schultz's Animation module for TLA+, and it transfers to RxJS one to one, because the operator specs and runtime tracers in this account already treat an Observable as a state machine.</p>
   <ul class="toc">
@@ -618,14 +618,14 @@ type View = (frame: FrameState) =&gt; SvgElem;       // pure, exactly like the T
 
 <section id="milestones" class="prose">
   <h2>Milestones</h2>
-  <p>The six steps are the project's milestones, <a href="https://github.com/hansschenker/tla-rxjs-svg/milestones">tracked on GitHub</a>, ordered by dependency and by how much existing code each reuses.</p>
+  <p>The six steps are the project's milestones, <a href="https://github.com/hansschenker/rxjs-trace-viewer/milestones">tracked on GitHub</a>, ordered by dependency and by how much existing code each reuses.</p>
   <ol class="steps">
-    <li><div><strong><a href="https://github.com/hansschenker/tla-rxjs-svg/milestone/1">M1 &middot; SVG frames over tla-ts traces</a></strong>Extend <code>trace-to-marble.mjs</code> with a frame renderer and a ported stepper page. Animate the four bug demos in the specs manifest: mergeMap where switchMap was intended, the concatMap stall, the shareReplay leak and the combineLatest hang. A few hundred lines; the trace parsing already exists.</div></li>
-    <li><div><strong><a href="https://github.com/hansschenker/tla-rxjs-svg/milestone/2">M2 &middot; Extract the frame type and the model adapter</a></strong>Move <code>FrameState</code>, <code>SvgElem</code> and <code>fromTlaTrace</code> into this repository as a package, with Vitest tests on the adapter against the fixture traces.</div></li>
-    <li><div><strong><a href="https://github.com/hansschenker/tla-rxjs-svg/milestone/3">M3 &middot; Runtime adapter</a></strong>Write <code>fromExecutionTrace</code> as a <code>scan</code> over <code>ExecutionEvent[]</code>, reusing the lane classification from the <code>rxotn</code> package, and populate inner lanes from parent links.</div></li>
-    <li><div><strong><a href="https://github.com/hansschenker/tla-rxjs-svg/milestone/4">M4 &middot; Animator components</a></strong>A framework-less JSX component for <code>rxjs-ds</code> and a matching Vue component for <code>rxjs-vitepress-ds</code>, so operator documentation pages can embed an animated counterexample.</div></li>
-    <li><div><strong><a href="https://github.com/hansschenker/tla-rxjs-svg/milestone/5">M5 &middot; Model beside runtime</a></strong>Play a spec counterexample and a <code>TestScheduler</code> recording of the same scenario in two synchronised steppers. The conformance tests in <code>rxjs-operator-tla</code> already pair the two.</div></li>
-    <li><div><strong><a href="https://github.com/hansschenker/tla-rxjs-svg/milestone/6">M6 &middot; Interactive exploration</a></strong>Blocked on a step or evaluate API from tla-ts for the model track; available sooner on the runtime track through the scheduler.</div></li>
+    <li><div><strong><a href="https://github.com/hansschenker/rxjs-trace-viewer/milestone/1">M1 &middot; SVG frames over tla-ts traces</a></strong>Extend <code>trace-to-marble.mjs</code> with a frame renderer and a ported stepper page. Animate the four bug demos in the specs manifest: mergeMap where switchMap was intended, the concatMap stall, the shareReplay leak and the combineLatest hang. A few hundred lines; the trace parsing already exists.</div></li>
+    <li><div><strong><a href="https://github.com/hansschenker/rxjs-trace-viewer/milestone/2">M2 &middot; Extract the frame type and the model adapter</a></strong>Move <code>FrameState</code>, <code>SvgElem</code> and <code>fromTlaTrace</code> into this repository as a package, with Vitest tests on the adapter against the fixture traces.</div></li>
+    <li><div><strong><a href="https://github.com/hansschenker/rxjs-trace-viewer/milestone/3">M3 &middot; Runtime adapter</a></strong>Write <code>fromExecutionTrace</code> as a <code>scan</code> over <code>ExecutionEvent[]</code>, reusing the lane classification from the <code>rxotn</code> package, and populate inner lanes from parent links.</div></li>
+    <li><div><strong><a href="https://github.com/hansschenker/rxjs-trace-viewer/milestone/4">M4 &middot; Animator components</a></strong>A framework-less JSX component for <code>rxjs-ds</code> and a matching Vue component for <code>rxjs-vitepress-ds</code>, so operator documentation pages can embed an animated counterexample.</div></li>
+    <li><div><strong><a href="https://github.com/hansschenker/rxjs-trace-viewer/milestone/5">M5 &middot; Model beside runtime</a></strong>Play a spec counterexample and a <code>TestScheduler</code> recording of the same scenario in two synchronised steppers. The conformance tests in <code>rxjs-operator-tla</code> already pair the two.</div></li>
+    <li><div><strong><a href="https://github.com/hansschenker/rxjs-trace-viewer/milestone/6">M6 &middot; Interactive exploration</a></strong>Blocked on a step or evaluate API from tla-ts for the model track; available sooner on the runtime track through the scheduler.</div></li>
   </ol>
 </section>
 
@@ -643,7 +643,7 @@ type View = (frame: FrameState) =&gt; SvgElem;       // pure, exactly like the T
   </ul>
 </section>
 
-<footer>Written on 2 November 2026 from a reading of the tlaplus_animation clone, the talk's transcript, and the repositories named above. Kept at <a href="https://github.com/hansschenker/tla-rxjs-svg">github.com/hansschenker/tla-rxjs-svg</a>.</footer>
+<footer>Written on 2 November 2026 from a reading of the tlaplus_animation clone, the talk's transcript, and the repositories named above. Kept at <a href="https://github.com/hansschenker/rxjs-trace-viewer">github.com/hansschenker/rxjs-trace-viewer</a>.</footer>
 </div>
 </body>
 </html>

@@ -1,26 +1,7 @@
 import { formatValue, type Value } from "tla-ts";
+import type { JsValue } from "./values.ts";
 
-/**
- * A TLA+ value as plain JavaScript. Sequences become arrays, records and
- * functions become objects keyed by the formatted domain element, model
- * values become their names, sets become arrays. Anything else is kept as
- * tla-ts formats it.
- */
-export type JsValue =
-  | string
-  | number
-  | boolean
-  | readonly JsValue[]
-  | { readonly [key: string]: JsValue };
-
-export type JsRecord = { readonly [key: string]: JsValue };
-
-export const isJsArray = (v: JsValue | undefined): v is readonly JsValue[] =>
-  Array.isArray(v);
-
-export const isJsRecord = (v: JsValue | undefined): v is JsRecord =>
-  typeof v === "object" && v !== null && !Array.isArray(v);
-
+/** Converts a tla-ts value to plain JavaScript; see values.ts for the shape. */
 export function toJs(value: Value): JsValue {
   if (typeof value !== "object") return value;
   switch (value.kind) {

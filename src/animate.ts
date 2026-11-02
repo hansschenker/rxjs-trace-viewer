@@ -21,13 +21,17 @@ export interface AnimationPage {
 export function renderAnimationHtml(p: AnimationPage): string {
   const stepsJson = JSON.stringify(p.steps).replace(/</g, "\\u003c");
   const stepItems = p.steps
-    .map((action, i) => `<li><button type="button" data-step="${i}"><span class="n">${i}</span>${escapeText(action)}</button></li>`)
+    .map(
+      (action, i) =>
+        `<li><button type="button" data-step="${i}"><span class="n">${i}</span>${escapeText(action)}</button></li>`,
+    )
     .join("\n        ");
   const loopNote =
     p.loopStart === null
       ? ""
       : `<p class="loop">Liveness violation: after the last frame the trace loops back to frame ${p.loopStart} forever.</p>`;
-  const note = p.note === undefined ? "" : `<p class="note">${escapeText(p.note)}</p>`;
+  const note =
+    p.note === undefined ? "" : `<p class="note">${escapeText(p.note)}</p>`;
 
   return `<!doctype html>
 <html lang="en">

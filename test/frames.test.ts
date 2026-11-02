@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { fromTlaTrace } from "../src/frames.ts";
-import type { TraceFile } from "../src/trace.ts";
-import { buildTimeline } from "../src/view.ts";
+import { buildTimeline, fromTlaTrace, type TraceFile } from "../src/index.ts";
 
-const file = (module: string, steps: TraceFile["steps"], loopStart: number | null = null): TraceFile => ({
+const file = (
+  module: string,
+  steps: TraceFile["steps"],
+  loopStart: number | null = null,
+): TraceFile => ({
   cfg: `${module}.cfg`,
   module,
   status: "invariant-violation",
@@ -13,26 +15,149 @@ const file = (module: string, steps: TraceFile["steps"], loopStart: number | nul
 
 /** A trace shaped like Take.tla: take(2) receives a, b and completes. */
 const take = file("Take", [
-  { index: 0, action: "Init", state: { in: [], inDone: "active", out: [], outDone: "active", subscribed: true } },
-  { index: 1, action: "SourceNext", state: { in: ["a"], inDone: "active", out: ["a"], outDone: "active", subscribed: true } },
-  { index: 2, action: "SourceNext", state: { in: ["a", "b"], inDone: "active", out: ["a", "b"], outDone: "complete", subscribed: false } },
+  {
+    index: 0,
+    action: "Init",
+    state: {
+      in: [],
+      inDone: "active",
+      out: [],
+      outDone: "active",
+      subscribed: true,
+    },
+  },
+  {
+    index: 1,
+    action: "SourceNext",
+    state: {
+      in: ["a"],
+      inDone: "active",
+      out: ["a"],
+      outDone: "active",
+      subscribed: true,
+    },
+  },
+  {
+    index: 2,
+    action: "SourceNext",
+    state: {
+      in: ["a", "b"],
+      inDone: "active",
+      out: ["a", "b"],
+      outDone: "complete",
+      subscribed: false,
+    },
+  },
 ]);
 
 /** A trace shaped like Share.tla: two subscriptions, two values, one leaves. The buffer slides. */
 const share = file("Share", [
-  { index: 0, action: "Init", state: { sub: { s1: "idle", s2: "idle" }, received: { s1: [], s2: [] }, subject: "none", buffer: [], srcSent: [] } },
-  { index: 1, action: "Subscribe", state: { sub: { s1: "on", s2: "idle" }, received: { s1: [], s2: [] }, subject: "live", buffer: [], srcSent: [] } },
-  { index: 2, action: "SourceNext", state: { sub: { s1: "on", s2: "idle" }, received: { s1: ["a"], s2: [] }, subject: "live", buffer: ["a"], srcSent: ["a"] } },
-  { index: 3, action: "SourceNext", state: { sub: { s1: "on", s2: "idle" }, received: { s1: ["a", "b"], s2: [] }, subject: "live", buffer: ["b"], srcSent: ["a", "b"] } },
-  { index: 4, action: "Unsubscribe", state: { sub: { s1: "off", s2: "idle" }, received: { s1: ["a", "b"], s2: [] }, subject: "live", buffer: ["b"], srcSent: ["a", "b"] } },
+  {
+    index: 0,
+    action: "Init",
+    state: {
+      sub: { s1: "idle", s2: "idle" },
+      received: { s1: [], s2: [] },
+      subject: "none",
+      buffer: [],
+      srcSent: [],
+    },
+  },
+  {
+    index: 1,
+    action: "Subscribe",
+    state: {
+      sub: { s1: "on", s2: "idle" },
+      received: { s1: [], s2: [] },
+      subject: "live",
+      buffer: [],
+      srcSent: [],
+    },
+  },
+  {
+    index: 2,
+    action: "SourceNext",
+    state: {
+      sub: { s1: "on", s2: "idle" },
+      received: { s1: ["a"], s2: [] },
+      subject: "live",
+      buffer: ["a"],
+      srcSent: ["a"],
+    },
+  },
+  {
+    index: 3,
+    action: "SourceNext",
+    state: {
+      sub: { s1: "on", s2: "idle" },
+      received: { s1: ["a", "b"], s2: [] },
+      subject: "live",
+      buffer: ["b"],
+      srcSent: ["a", "b"],
+    },
+  },
+  {
+    index: 4,
+    action: "Unsubscribe",
+    state: {
+      sub: { s1: "off", s2: "idle" },
+      received: { s1: ["a", "b"], s2: [] },
+      subject: "live",
+      buffer: ["b"],
+      srcSent: ["a", "b"],
+    },
+  },
 ]);
 
 /** A trace shaped like Flatten.tla with switchMap: inner 1 is cancelled when inner 2 starts. */
 const flatten = file("Flatten", [
-  { index: 0, action: "Init", state: { outerDone: "active", inner: [], out: [], outDone: "active", subscribed: true } },
-  { index: 1, action: "OuterNext", state: { outerDone: "active", inner: [{ state: "active", sent: 0 }], out: [], outDone: "active", subscribed: true } },
-  { index: 2, action: "InnerNext", state: { outerDone: "active", inner: [{ state: "active", sent: 1 }], out: [[1, 1]], outDone: "active", subscribed: true } },
-  { index: 3, action: "OuterNext", state: { outerDone: "active", inner: [{ state: "cancelled", sent: 1 }, { state: "active", sent: 0 }], out: [[1, 1]], outDone: "active", subscribed: true } },
+  {
+    index: 0,
+    action: "Init",
+    state: {
+      outerDone: "active",
+      inner: [],
+      out: [],
+      outDone: "active",
+      subscribed: true,
+    },
+  },
+  {
+    index: 1,
+    action: "OuterNext",
+    state: {
+      outerDone: "active",
+      inner: [{ state: "active", sent: 0 }],
+      out: [],
+      outDone: "active",
+      subscribed: true,
+    },
+  },
+  {
+    index: 2,
+    action: "InnerNext",
+    state: {
+      outerDone: "active",
+      inner: [{ state: "active", sent: 1 }],
+      out: [[1, 1]],
+      outDone: "active",
+      subscribed: true,
+    },
+  },
+  {
+    index: 3,
+    action: "OuterNext",
+    state: {
+      outerDone: "active",
+      inner: [
+        { state: "cancelled", sent: 1 },
+        { state: "active", sent: 0 },
+      ],
+      out: [[1, 1]],
+      outDone: "active",
+      subscribed: true,
+    },
+  },
 ]);
 
 describe("fromTlaTrace", () => {
@@ -43,7 +168,10 @@ describe("fromTlaTrace", () => {
       { name: "out", kind: "stream" },
     ]);
     expect(set.frames).toHaveLength(3);
-    expect(set.frames[2].streams.out).toEqual({ vals: ["a", "b"], status: "complete" });
+    expect(set.frames[2].streams.out).toEqual({
+      vals: ["a", "b"],
+      status: "complete",
+    });
     expect(set.frames[1].streams.out.status).toBe("active");
   });
 
@@ -61,7 +189,11 @@ describe("fromTlaTrace", () => {
 
   it("makes one stream per subscription, shows its lifecycle on the same lane, and leaves a sliding buffer to the panel", () => {
     const set = fromTlaTrace(share);
-    expect(set.lanes.map((l) => l.name)).toEqual(["received[s1]", "received[s2]", "srcSent"]);
+    expect(set.lanes.map((l) => l.name)).toEqual([
+      "received[s1]",
+      "received[s2]",
+      "srcSent",
+    ]);
     expect(set.frames[1].subs["received[s1]"]).toBe("on");
     expect(set.frames[4].subs["received[s1]"]).toBe("off");
     expect(set.frames[3].streams["received[s1]"].vals).toEqual(["a", "b"]);
@@ -76,18 +208,41 @@ describe("fromTlaTrace", () => {
       { name: "out", kind: "stream" },
     ]);
     expect(set.frames[0].items["inner[1]"]).toBeNull();
-    expect(set.frames[3].items["inner[1]"]).toEqual({ state: "cancelled", sent: 1 });
-    expect(Object.keys(set.frames[0].internals)).toEqual(["outerDone", "subscribed"]);
+    expect(set.frames[3].items["inner[1]"]).toEqual({
+      state: "cancelled",
+      sent: 1,
+    });
+    expect(Object.keys(set.frames[0].internals)).toEqual([
+      "outerDone",
+      "subscribed",
+    ]);
   });
 
-  it("orders lanes by the spec's VARIABLES declaration when the trace carries it", () => {
-    const set = fromTlaTrace({ ...take, variables: ["out", "outDone", "in", "inDone", "subscribed"] });
-    expect(set.lanes.map((l) => l.name)).toEqual(["out", "in"]);
+  it("orders lanes and the panel by the spec's VARIABLES declaration when the trace carries it", () => {
+    const set = fromTlaTrace({
+      ...share,
+      variables: ["srcSent", "buffer", "subject", "received", "sub"],
+    });
+    expect(set.lanes.map((l) => l.name)).toEqual([
+      "srcSent",
+      "received[s1]",
+      "received[s2]",
+    ]);
+    expect(Object.keys(set.frames[0].internals)).toEqual(["buffer", "subject"]);
   });
 
   it("carries the loop start of a liveness counterexample", () => {
     const set = fromTlaTrace(file("Take", take.steps, 1));
     expect(set.loopStart).toBe(1);
+  });
+
+  it("returns an empty set for a trace without states", () => {
+    expect(fromTlaTrace(file("Take", []))).toEqual({
+      frames: [],
+      hasTime: false,
+      loopStart: null,
+      lanes: [],
+    });
   });
 });
 
@@ -116,12 +271,22 @@ describe("buildTimeline", () => {
 
   it("marks item changes with the new state or the moved fields", () => {
     const tl = buildTimeline(fromTlaTrace(flatten));
-    expect(tl.marks.filter((m) => m.lane === "inner[1]").map((m) => [m.step, m.label])).toEqual([
+    expect(
+      tl.marks
+        .filter((m) => m.lane === "inner[1]")
+        .map((m) => [m.step, m.label]),
+    ).toEqual([
       [1, "active"],
       [2, "sent=1"],
       [3, "cancelled"],
     ]);
-    expect(tl.marks.filter((m) => m.lane === "inner[2]").map((m) => [m.step, m.label])).toEqual([[3, "active"]]);
-    expect(tl.marks.filter((m) => m.lane === "out").map((m) => [m.step, m.label])).toEqual([[2, "1,1"]]);
+    expect(
+      tl.marks
+        .filter((m) => m.lane === "inner[2]")
+        .map((m) => [m.step, m.label]),
+    ).toEqual([[3, "active"]]);
+    expect(
+      tl.marks.filter((m) => m.lane === "out").map((m) => [m.step, m.label]),
+    ).toEqual([[2, "1,1"]]);
   });
 });

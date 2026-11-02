@@ -13,13 +13,14 @@ most of the parts already exist in sibling repositories.
 - The same content in Markdown: this file
 
 This repository is also where the prototype lives: an **RxJS Trace Viewer**
-built on the one-frame-per-state idea. Milestone M1, SVG frames over tla-ts
-traces, is in `src/`; see [Prototype](#prototype).
+built on the one-frame-per-state idea. Milestones M1 (SVG frames over
+tla-ts traces) and M2 (the package) are done; see [Prototype](#prototype).
 
 ## Prototype
 
-Milestone M1 runs on Node 24 with no build step (Node strips the types
-itself). It needs a checkout of
+The prototype runs on Node 24 with no build step (Node strips the types
+itself); `npm run build` emits `dist/` with type declarations for consumers.
+Checking needs a checkout of
 [rxjs-operator-tla](https://github.com/hansschenker/rxjs-operator-tla) next
 to this repository, or `--specs <dir>` pointing at its `specs` folder.
 
@@ -28,7 +29,7 @@ npm install
 npm run animate                                   # the four bug demos
 npm run animate -- Take.cfg Pipeline.cfg          # any configs from the manifest
 npm run animate -- --specs ../rxjs-operator-tla/specs
-npm test && npm run typecheck
+npm run verify                                    # format, typecheck, test, build, animate
 ```
 
 `animate` checks each config with tla-ts, writes the counterexample to
@@ -39,14 +40,40 @@ click a step in the list. `trace` and `render` run the two halves alone.
 
 | File | Role |
 |---|---|
-| `src/trace.ts` | `runTrace`: tla-ts `check()` to a `TraceFile`, states as plain JavaScript, VARIABLES in declaration order |
+| `src/index.ts` | the core entry, `tla-rxjs-svg`: browser-safe, no Node or tla-ts |
+| `src/tla.ts` | the checking entry, `tla-rxjs-svg/tla`: Node and tla-ts |
+| `src/values.ts` | `JsValue`, a TLA+ value as plain JavaScript |
+| `src/trace-file.ts` | `TraceFile`, the shape of `traces/<cfg>.json` |
+| `src/trace.ts` | `runTrace`: tla-ts `check()` to a `TraceFile`, VARIABLES in declaration order |
+| `src/tla-values.ts` | `toJs`, tla-ts values to `JsValue` |
 | `src/frames.ts` | `FrameState` and the model adapter `fromTlaTrace` |
 | `src/view.ts` | the View: `buildTimeline`, `layoutFor`, `renderFrame` |
 | `src/svg.ts` | `SvgElem` records and `serialize`, after `SVGElem` and `SVGElemToString` in Animation.tla |
 | `src/animate.ts` | the playback page, after `template.html` |
-| `src/cli.ts` | `trace`, `render`, `animate` |
+| `src/render.ts` | `renderTrace`: `TraceFile` to frames and page in one call |
+| `src/cli.ts`, `src/cli-args.ts` | `trace`, `render`, `animate` |
+| `test/` | unit tests on synthetic traces, fixture tests on the four demos, page and CLI tests |
 | `traces/` | the four demo counterexamples, committed as fixtures |
 | `out/` | the four generated animations |
+
+### Package
+
+Two entry points, so a page can render frames without the checker:
+
+```ts
+import { runTrace } from "tla-rxjs-svg/tla"; // Node + tla-ts: check a config
+import { renderTrace, fromTlaTrace } from "tla-rxjs-svg"; // browser-safe
+
+const file = await runTrace("../rxjs-operator-tla/specs", "Flatten_bug_mergeForSwitch.cfg");
+const { html, frames, set } = renderTrace(file); // page, SVG frames, FrameState[]
+const frameSet = fromTlaTrace(file); // only the adapter
+```
+
+`renderTrace` returns the `FrameSet`, the `Timeline` of marks, the shared
+`Layout`, one `SvgElem` per frame and the page. The lower-level pieces
+(`buildTimeline`, `layoutFor`, `renderFrame`, `serialize`,
+`renderAnimationHtml`) are exported too, for a component that renders one
+frame on demand (milestone M4).
 
 How a frame is built from a state, by the conventions of the specs:
 

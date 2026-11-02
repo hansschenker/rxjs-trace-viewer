@@ -19,8 +19,10 @@ export const el = (
   children: readonly SvgChild[] = [],
 ): SvgElem => ({ name, attrs, children });
 
-export const group = (children: readonly SvgChild[], attrs: Attrs = {}): SvgElem =>
-  el("g", attrs, children);
+export const group = (
+  children: readonly SvgChild[],
+  attrs: Attrs = {},
+): SvgElem => el("g", attrs, children);
 
 export const rect = (
   x: number,
@@ -30,8 +32,12 @@ export const rect = (
   attrs: Attrs = {},
 ): SvgElem => el("rect", { x, y, width, height, ...attrs });
 
-export const circle = (cx: number, cy: number, r: number, attrs: Attrs = {}): SvgElem =>
-  el("circle", { cx, cy, r, ...attrs });
+export const circle = (
+  cx: number,
+  cy: number,
+  r: number,
+  attrs: Attrs = {},
+): SvgElem => el("circle", { cx, cy, r, ...attrs });
 
 export const line = (
   x1: number,
@@ -55,7 +61,8 @@ export const title = (content: string): SvgElem => el("title", {}, [content]);
 export const escapeText = (s: string): string =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-export const escapeAttr = (s: string): string => escapeText(s).replace(/"/g, "&quot;");
+export const escapeAttr = (s: string): string =>
+  escapeText(s).replace(/"/g, "&quot;");
 
 const num = (v: string | number): string =>
   typeof v === "number" ? String(Math.round(v * 100) / 100) : v;

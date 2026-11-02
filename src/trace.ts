@@ -1,41 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { check, parseModule, type TraceStep } from "tla-ts";
-import { toJs, type JsValue } from "./tla-values.ts";
+import { toJs } from "./tla-values.ts";
+import type { ManifestEntry, TraceFile, TraceStepJs } from "./trace-file.ts";
+import type { JsValue } from "./values.ts";
 
-/** One state of a trace, with every variable converted to plain JavaScript. */
-export interface TraceStepJs {
-  readonly index: number;
-  readonly action: string;
-  readonly state: Readonly<Record<string, JsValue>>;
-}
-
-export interface TraceViolation {
-  readonly name: string;
-  /** Index of the state the trace loops back to, for liveness violations. */
-  readonly loopStart: number | null;
-}
-
-/** What `trace` writes to traces/<cfg>.json and `render` reads back. */
-export interface TraceFile {
-  readonly cfg: string;
-  readonly module: string;
-  readonly status: string;
-  readonly violation: TraceViolation | null;
-  readonly steps: readonly TraceStepJs[];
-  /** The module's VARIABLES in declaration order; lanes follow it. */
-  readonly variables?: readonly string[];
-  readonly family?: string;
-  readonly note?: string;
-}
-
-export interface ManifestEntry {
-  readonly module: string;
-  readonly cfg: string;
-  readonly expect?: string;
-  readonly family?: string;
-  readonly note?: string;
-}
+/*
+ * Checking: runs tla-ts on a config from a specs directory and turns the
+ * counterexample into a TraceFile. Node only.
+ */
 
 export function readManifest(specsDir: string): readonly ManifestEntry[] {
   const file = path.join(specsDir, "manifest.json");
@@ -109,5 +82,6 @@ function convertStep(step: TraceStep, index: number): TraceStepJs {
   };
 }
 
+/** `Flatten_bug_mergeForSwitch.cfg` -> `Flatten_bug_mergeForSwitch`. */
 export const traceStem = (cfgName: string): string =>
   path.basename(cfgName).replace(/\.cfg$/, "");

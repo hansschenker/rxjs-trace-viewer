@@ -13,7 +13,7 @@ most of the parts already exist in sibling repositories.
 - The same content in Markdown: this file
 
 This repository is also where the prototype will live: an **RxJS Trace Viewer**
-built on the one-frame-per-state idea, starting with roadmap step 1, SVG frames
+built on the one-frame-per-state idea, starting with milestone M1, SVG frames
 over tla-ts traces.
 
 > **Verdict.** A trace is a sequence of states. A view is a pure function from a
@@ -220,21 +220,21 @@ the action, not the action itself.
 
 ## Roadmap
 
-1. **SVG frames over tla-ts traces.** Extend `trace-to-marble.mjs` with a frame
+1. **[M1 SVG frames over tla-ts traces](https://github.com/hansschenker/tla-rxjs-svg/milestone/1).** Extend `trace-to-marble.mjs` with a frame
    renderer and a ported stepper page. Animate the four bug demos in the specs
    manifest: mergeMap where switchMap was intended, the concatMap stall, the
    shareReplay leak and the combineLatest hang.
-2. **Extract the frame type and the model adapter** into this repository as a
+2. **[M2 Extract the frame type and the model adapter](https://github.com/hansschenker/tla-rxjs-svg/milestone/2)** into this repository as a
    package, with Vitest tests on the adapter against fixture traces.
-3. **Runtime adapter.** `fromExecutionTrace` as a `scan` over `ExecutionEvent[]`,
+3. **[M3 Runtime adapter](https://github.com/hansschenker/tla-rxjs-svg/milestone/3).** `fromExecutionTrace` as a `scan` over `ExecutionEvent[]`,
    reusing lane classification from the `rxotn` package, inner lanes from parent
    links.
-4. **Animator components.** A framework-less JSX component for rxjs-ds and a
+4. **[M4 Animator components](https://github.com/hansschenker/tla-rxjs-svg/milestone/4).** A framework-less JSX component for rxjs-ds and a
    matching Vue component for rxjs-vitepress-ds, so operator documentation pages
    can embed an animated counterexample.
-5. **Model beside runtime.** Play a spec counterexample and a `TestScheduler`
+5. **[M5 Model beside runtime](https://github.com/hansschenker/tla-rxjs-svg/milestone/5).** Play a spec counterexample and a `TestScheduler`
    recording of the same scenario in two synchronised steppers.
-6. **Interactive exploration.** Blocked on a step or evaluate API from tla-ts for
+6. **[M6 Interactive exploration](https://github.com/hansschenker/tla-rxjs-svg/milestone/6).** Blocked on a step or evaluate API from tla-ts for
    the model track; available sooner on the runtime track through the scheduler.
 
 ## Sources

@@ -1,0 +1,257 @@
+{
+  "title": "mergeMap where switchMap was intended",
+  "note": "The outer delivers 0 at 0ms and 1 at 20ms; each inner delivers two values 10ms and 30ms after it starts. With mergeMap the first inner keeps running, so 1.2 arrives after 2.1: the stale result the Flatten bug demo finds.",
+  "labels": [
+    "source",
+    "inner",
+    "sink"
+  ],
+  "schemaVersion": 1,
+  "sessionId": "mergeMap_stale_inner",
+  "events": [
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 1,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 2,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 3,
+      "at": 0,
+      "kind": "next",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "value": 0
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 4,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-3",
+      "label": "inner",
+      "subscriptionId": "sub-3",
+      "parentSubscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 5,
+      "at": 10,
+      "kind": "next",
+      "observableId": "obs-3",
+      "label": "inner",
+      "subscriptionId": "sub-3",
+      "parentSubscriptionId": "sub-2",
+      "value": "1.1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 6,
+      "at": 10,
+      "kind": "next",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1",
+      "value": "1.1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 7,
+      "at": 20,
+      "kind": "next",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "value": 1
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 8,
+      "at": 20,
+      "kind": "subscribe",
+      "observableId": "obs-4",
+      "label": "inner",
+      "subscriptionId": "sub-4",
+      "parentSubscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 9,
+      "at": 20,
+      "kind": "complete",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 10,
+      "at": 20,
+      "kind": "unsubscribe",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "reason": "complete"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 11,
+      "at": 30,
+      "kind": "next",
+      "observableId": "obs-3",
+      "label": "inner",
+      "subscriptionId": "sub-3",
+      "parentSubscriptionId": "sub-2",
+      "value": "1.2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 12,
+      "at": 30,
+      "kind": "next",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1",
+      "value": "1.2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 13,
+      "at": 30,
+      "kind": "complete",
+      "observableId": "obs-3",
+      "label": "inner",
+      "subscriptionId": "sub-3",
+      "parentSubscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 14,
+      "at": 30,
+      "kind": "unsubscribe",
+      "observableId": "obs-3",
+      "label": "inner",
+      "subscriptionId": "sub-3",
+      "parentSubscriptionId": "sub-2",
+      "reason": "complete"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 15,
+      "at": 30,
+      "kind": "next",
+      "observableId": "obs-4",
+      "label": "inner",
+      "subscriptionId": "sub-4",
+      "parentSubscriptionId": "sub-2",
+      "value": "2.1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 16,
+      "at": 30,
+      "kind": "next",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1",
+      "value": "2.1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 17,
+      "at": 50,
+      "kind": "next",
+      "observableId": "obs-4",
+      "label": "inner",
+      "subscriptionId": "sub-4",
+      "parentSubscriptionId": "sub-2",
+      "value": "2.2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 18,
+      "at": 50,
+      "kind": "next",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1",
+      "value": "2.2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 19,
+      "at": 50,
+      "kind": "complete",
+      "observableId": "obs-4",
+      "label": "inner",
+      "subscriptionId": "sub-4",
+      "parentSubscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 20,
+      "at": 50,
+      "kind": "unsubscribe",
+      "observableId": "obs-4",
+      "label": "inner",
+      "subscriptionId": "sub-4",
+      "parentSubscriptionId": "sub-2",
+      "reason": "complete"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 21,
+      "at": 50,
+      "kind": "complete",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "mergeMap_stale_inner",
+      "sequence": 22,
+      "at": 50,
+      "kind": "unsubscribe",
+      "observableId": "obs-2",
+      "label": "sink",
+      "subscriptionId": "sub-1",
+      "reason": "complete"
+    }
+  ]
+}

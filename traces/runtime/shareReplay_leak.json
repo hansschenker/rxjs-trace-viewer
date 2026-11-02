@@ -1,0 +1,108 @@
+{
+  "title": "shareReplay(1) keeps the source running after the last subscriber leaves",
+  "note": "s1 subscribes at 0ms and leaves at 15ms. The source, traced before shareReplay, keeps delivering at 20ms and 30ms with nobody listening: the leak the Share demo finds, SourceStopsWhenUnused violated.",
+  "labels": [
+    "source",
+    "s1"
+  ],
+  "schemaVersion": 1,
+  "sessionId": "shareReplay_leak",
+  "events": [
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 1,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-2",
+      "label": "s1",
+      "subscriptionId": "sub-1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 2,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 3,
+      "at": 10,
+      "kind": "next",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "value": 0
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 4,
+      "at": 10,
+      "kind": "next",
+      "observableId": "obs-2",
+      "label": "s1",
+      "subscriptionId": "sub-1",
+      "value": 0
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 5,
+      "at": 15,
+      "kind": "unsubscribe",
+      "observableId": "obs-2",
+      "label": "s1",
+      "subscriptionId": "sub-1",
+      "reason": "cancel"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 6,
+      "at": 20,
+      "kind": "next",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "value": 1
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 7,
+      "at": 30,
+      "kind": "next",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "value": 2
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 8,
+      "at": 30,
+      "kind": "complete",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "shareReplay_leak",
+      "sequence": 9,
+      "at": 30,
+      "kind": "unsubscribe",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "reason": "complete"
+    }
+  ]
+}

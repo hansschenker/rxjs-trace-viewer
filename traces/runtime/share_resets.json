@@ -1,0 +1,76 @@
+{
+  "title": "share(): the source stops with the last subscriber",
+  "note": "The same scenario with share(). When s1 leaves at 15ms the refCount drops to zero and the source is unsubscribed (cancel): nothing runs unobserved.",
+  "labels": [
+    "source",
+    "s1"
+  ],
+  "schemaVersion": 1,
+  "sessionId": "share_resets",
+  "events": [
+    {
+      "schemaVersion": 1,
+      "sessionId": "share_resets",
+      "sequence": 1,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-2",
+      "label": "s1",
+      "subscriptionId": "sub-1"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "share_resets",
+      "sequence": 2,
+      "at": 0,
+      "kind": "subscribe",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "share_resets",
+      "sequence": 3,
+      "at": 10,
+      "kind": "next",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "value": 0
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "share_resets",
+      "sequence": 4,
+      "at": 10,
+      "kind": "next",
+      "observableId": "obs-2",
+      "label": "s1",
+      "subscriptionId": "sub-1",
+      "value": 0
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "share_resets",
+      "sequence": 5,
+      "at": 15,
+      "kind": "unsubscribe",
+      "observableId": "obs-2",
+      "label": "s1",
+      "subscriptionId": "sub-1",
+      "reason": "cancel"
+    },
+    {
+      "schemaVersion": 1,
+      "sessionId": "share_resets",
+      "sequence": 6,
+      "at": 15,
+      "kind": "unsubscribe",
+      "observableId": "obs-1",
+      "label": "source",
+      "subscriptionId": "sub-2",
+      "reason": "cancel"
+    }
+  ]
+}

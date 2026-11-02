@@ -1,5 +1,5 @@
 /*
- * tla-rxjs-svg, the core: frame state, the model adapter, the View and the
+ * tla-rxjs-svg, the core: frame state, the two adapters, the View and the
  * playback page. No dependency on Node or tla-ts, so it can run in a
  * browser. Checking a spec lives in the `tla-rxjs-svg/tla` entry.
  */
@@ -15,6 +15,20 @@ export type {
 } from "./trace-file.ts";
 
 export type {
+  CompleteEvent,
+  ErrorEvent,
+  ExecutionEvent,
+  ExecutionTrace,
+  JsonPrimitive,
+  JsonValue,
+  NextEvent,
+  SessionEvent,
+  SubscribeEvent,
+  UnsubscribeEvent,
+  UnsubscribeReason,
+} from "./execution-trace.ts";
+
+export type {
   FrameSet,
   FrameState,
   Lane,
@@ -24,6 +38,7 @@ export type {
   SubState,
 } from "./frames.ts";
 export { fromTlaTrace } from "./frames.ts";
+export { fromExecutionTrace, fromJson } from "./runtime.ts";
 
 export type { Layout, Mark, MarkKind, Timeline } from "./view.ts";
 export {
@@ -51,8 +66,20 @@ export {
   title,
 } from "./svg.ts";
 
-export type { AnimationPage } from "./animate.ts";
-export { renderAnimationHtml } from "./animate.ts";
+export type {
+  AnimationPage,
+  FragmentOptions,
+  GalleryItem,
+  GalleryPage,
+} from "./animate.ts";
+export {
+  ANIMATION_CSS,
+  ANIMATION_SCRIPT,
+  renderAnimationFragment,
+  renderAnimationHtml,
+  renderGalleryFragment,
+  renderGalleryHtml,
+} from "./animate.ts";
 
-export type { RenderOptions, RenderedTrace } from "./render.ts";
-export { renderTrace } from "./render.ts";
+export type { PageText, RenderOptions, RenderedTrace } from "./render.ts";
+export { renderExecutionTrace, renderFrameSet, renderTrace } from "./render.ts";

@@ -1,6 +1,6 @@
 {
   "name": "tla-rxjs-svg",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "RxJS Trace Viewer: one SVG frame per state of a TLA+ trace, after Will Schultz's TLA+ Animation module",
   "type": "module",
@@ -19,7 +19,8 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "scripts"
   ],
   "sideEffects": false,
   "scripts": {
@@ -31,7 +32,10 @@
     "test": "vitest run",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
-    "verify": "npm run format:check && npm run typecheck && npm test && npm run build && npm run animate"
+    "verify": "npm run format:check && npm run typecheck && npm test && npm run build && npm run animate && npm run render:runtime && npm run gallery",
+    "record:runtime": "node scripts/record-runtime.mjs",
+    "render:runtime": "node src/cli.ts render-runtime",
+    "gallery": "node src/cli.ts gallery"
   },
   "engines": {
     "node": ">=24"

@@ -13,17 +13,32 @@ export const DEMOS: readonly string[] = [
   "CombineLatest_SilentB.cfg",
 ];
 
+export const COMMANDS = [
+  "trace",
+  "render",
+  "animate",
+  "render-runtime",
+  "gallery",
+] as const;
+export type Command = (typeof COMMANDS)[number];
+
 export interface Options {
-  readonly command: string;
-  readonly cfgs: readonly string[];
+  readonly command: Command;
+  /** Configs for trace, render and animate; recording names for render-runtime. */
+  readonly names: readonly string[];
   /** Where the .tla, .cfg and manifest.json live. */
   readonly specs: string;
   readonly traces: string;
+  /** Where recorded runs live, as rxjs-execution-debugger exports them. */
+  readonly runtime: string;
   readonly out: string;
 }
 
+const isCommand = (s: string): s is Command =>
+  (COMMANDS as readonly string[]).includes(s);
+
 /**
- * `<command> [cfg ...] [--specs dir] [--traces dir] [--out dir]`.
+ * `<command> [name ...] [--specs dir] [--traces dir] [--runtime dir] [--out dir]`.
  * Directories resolve against `base`; the specs default to the
  * rxjs-operator-tla checkout next to this package.
  */
@@ -41,14 +56,19 @@ export function parseArgs(argv: readonly string[], base: string): Options {
       positional.push(arg);
     }
   }
-  const [command = "animate", ...cfgs] = positional;
+  const [command = "animate", ...names] = positional;
+  if (!isCommand(command)) {
+    throw new Error(`unknown command ${command}; use ${COMMANDS.join(", ")}`);
+  }
   const dir = (key: string, fallback: string): string =>
     path.resolve(base, opts[key] ?? fallback);
+  const defaults = command === "render-runtime" ? [] : DEMOS;
   return {
     command,
-    cfgs: cfgs.length > 0 ? cfgs : DEMOS,
+    names: names.length > 0 ? names : defaults,
     specs: dir("specs", "../rxjs-operator-tla/specs"),
     traces: dir("traces", "traces"),
+    runtime: dir("runtime", "traces/runtime"),
     out: dir("out", "out"),
   };
 }

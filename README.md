@@ -1,7 +1,7 @@
-# tla-rxjs-svg
+# RxJS Trace Viewer
 
-One frame per state: adapting the TLA+ Animation module to an RxJS state tracing
-animation tool.
+`tla-rxjs-svg`: one frame per state, adapting the TLA+ Animation module to an
+RxJS state tracing animation tool.
 
 This repository holds the design note that came out of reading Will Schultz's
 [tlaplus_animation](https://github.com/will62794/tlaplus_animation) module and his
@@ -11,10 +11,13 @@ most of the parts already exist in sibling repositories.
 - Design page with diagrams: [`docs/index.html`](docs/index.html)
 - Published copy as a Claude artifact (private link): https://claude.ai/code/artifact/cd46e489-ca69-4f56-9dcc-03461be6889e
 - The same content in Markdown: this file
+- The gallery of every animation, model and runtime, as a Claude artifact (private link): https://claude.ai/code/artifact/8d87eb3c-d2cb-4303-b981-65a6687d59b0
 
 This repository is also where the prototype lives: an **RxJS Trace Viewer**
 built on the one-frame-per-state idea. Milestones M1 (SVG frames over
-tla-ts traces) and M2 (the package) are done; see [Prototype](#prototype).
+tla-ts traces), M2 (the package) and M3 (the runtime adapter) are done; see
+[Prototype](#prototype). The gallery of every animation, model and runtime,
+is `out/gallery.html`.
 
 ## Prototype
 
@@ -26,10 +29,21 @@ to this repository, or `--specs <dir>` pointing at its `specs` folder.
 
 ```bash
 npm install
-npm run animate                                   # the four bug demos
+npm run animate                                   # the four bug demos, from the specs
 npm run animate -- Take.cfg Pipeline.cfg          # any configs from the manifest
 npm run animate -- --specs ../rxjs-operator-tla/specs
-npm run verify                                    # format, typecheck, test, build, animate
+npm run render:runtime                            # the recorded runs under traces/runtime
+npm run gallery                                   # every animation on one page: out/gallery.html
+npm run verify                                    # format, typecheck, test, build, all of the above
+```
+
+The recordings under `traces/runtime` are committed. To record them again,
+or to add scenarios, a built checkout of
+[rxjs-execution-debugger](https://github.com/hansschenker/rxjs-execution-debugger)
+next to this repository is needed:
+
+```bash
+npm run record:runtime -- --debugger ../rxjs-execution-debugger
 ```
 
 `animate` checks each config with tla-ts, writes the counterexample to
@@ -47,14 +61,38 @@ click a step in the list. `trace` and `render` run the two halves alone.
 | `src/trace.ts` | `runTrace`: tla-ts `check()` to a `TraceFile`, VARIABLES in declaration order |
 | `src/tla-values.ts` | `toJs`, tla-ts values to `JsValue` |
 | `src/frames.ts` | `FrameState` and the model adapter `fromTlaTrace` |
+| `src/execution-trace.ts` | `ExecutionTrace`, the exported log of rxjs-execution-debugger, declared here |
+| `src/runtime.ts` | the runtime adapter `fromExecutionTrace`: the fold from events to frames |
 | `src/view.ts` | the View: `buildTimeline`, `layoutFor`, `renderFrame` |
 | `src/svg.ts` | `SvgElem` records and `serialize`, after `SVGElem` and `SVGElemToString` in Animation.tla |
-| `src/animate.ts` | the playback page, after `template.html` |
-| `src/render.ts` | `renderTrace`: `TraceFile` to frames and page in one call |
-| `src/cli.ts`, `src/cli-args.ts` | `trace`, `render`, `animate` |
-| `test/` | unit tests on synthetic traces, fixture tests on the four demos, page and CLI tests |
-| `traces/` | the four demo counterexamples, committed as fixtures |
-| `out/` | the four generated animations |
+| `src/animate.ts` | the playback page and the gallery, after `template.html` |
+| `src/render.ts` | `renderTrace`, `renderExecutionTrace`: a trace to frames and page in one call |
+| `src/cli.ts`, `src/cli-args.ts` | `trace`, `render`, `animate`, `render-runtime`, `gallery` |
+| `scripts/record-runtime.mjs` | records the runtime scenarios through the debugger's `trace()` under virtual time |
+| `test/` | unit tests on synthetic traces, fixture tests on the demos and recordings, page, gallery and CLI tests |
+| `traces/` | the four demo counterexamples and, under `runtime/`, six recorded runs |
+| `out/` | the generated animations and the gallery |
+
+### Runtime traces
+
+`fromExecutionTrace` is the fold the design note promised. The debugger's
+log is a list of events, not states, so each event is applied to the state
+after the previous one: subscribe turns a lane on, next appends a value,
+complete and error end it, unsubscribe with reason cancel turns it off. One
+lane per subscription, named by its trace label and numbered when a label
+is subscribed more than once (`inner[1]`, `inner[2]`); a subscription with a
+parent is placed right after it. The recording's `labels` give the display
+order, as a spec's VARIABLES do for the model side. Columns are the
+distinct event times, labelled in milliseconds. The panel shows which
+lanes are currently subscribed, which is what makes the shareReplay leak
+visible at a glance.
+
+The six recordings mirror the model demos and add the two contrasts:
+mergeMap against switchMap, and shareReplay against share. Where the model
+knows more than the runtime, the animation says so: the concatMap stall
+shows the queued inner as `pending` on the model side and not at all on
+the runtime side, because an inner that is never subscribed produces no
+events.
 
 ### Package
 

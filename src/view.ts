@@ -1,5 +1,4 @@
 import type { FrameSet } from "./frames.ts";
-import { isJsArray, type JsRecord, type JsValue } from "./values.ts";
 import {
   circle,
   el,
@@ -11,6 +10,7 @@ import {
   type Attrs,
   type SvgElem,
 } from "./svg.ts";
+import { isJsArray, type JsRecord, type JsValue } from "./values.ts";
 
 /*
  * The View: a pure function from a frame to an SVG element tree, like the
@@ -83,14 +83,16 @@ export function buildTimeline(set: FrameSet): Timeline {
             formatTla(b.vals[j]),
           );
         }
-        if (a.status === "active" && b.status !== "active")
+        if (a.status === "active" && b.status !== "active") {
           push(name, i, column, b.status, b.status, b.status);
+        }
       }
       if (kind === "item") {
         const a = prev.items[name] ?? null;
         const b = cur.items[name] ?? null;
-        if (b !== null && (a === null || !same(a, b)))
+        if (b !== null && (a === null || !same(a, b))) {
           push(name, i, column, "state", itemLabel(a, b), formatTla(b));
+        }
       }
       const sa = prev.subs[name];
       const sb = cur.subs[name];
@@ -98,8 +100,9 @@ export function buildTimeline(set: FrameSet): Timeline {
       if (sb === "on") push(name, i, column, "subscribe", "^", "subscribe");
       else if (sb === "off")
         push(name, i, column, "unsubscribe", "!", "unsubscribe");
-      else if (kind === "sub" && (sb === "complete" || sb === "error"))
+      else if (kind === "sub" && (sb === "complete" || sb === "error")) {
         push(name, i, column, sb, sb, sb);
+      }
     }
   }
   const lastColumn = Math.max(0, ...set.frames.map((f) => f.column));
@@ -118,20 +121,31 @@ export interface Layout {
   readonly panelW: number;
 }
 
+const pillWidth = (label: string): number => label.length * 6.3 + 12;
+const columnLabel = (set: FrameSet, c: number): string =>
+  set.columnLabels?.[c] ?? (set.hasTime ? `t${c}` : String(c));
+
 /** One layout for the whole trace, so every frame shares a viewBox. */
 export function layoutFor(set: FrameSet, tl: Timeline): Layout {
   const nCols = tl.lastColumn + 1;
-  const widest = Math.max(
+  const widestPill = Math.max(
     0,
     ...tl.marks
       .filter((m) => m.kind === "state")
       .map((m) => pillWidth(m.label)),
   );
+  const widestLabel = Math.max(
+    0,
+    ...Array.from(
+      { length: nCols },
+      (_, c) => columnLabel(set, c).length * 6.3 + 8,
+    ),
+  );
   const colW = Math.max(
     34,
-    Math.min(96, Math.floor(600 / nCols), 0),
-    widest + 8,
     Math.min(84, Math.floor(600 / nCols)),
+    widestPill + 8,
+    widestLabel,
   );
   const r = Math.min(12, Math.max(8, Math.floor(colW * 0.36)));
   const nameLen = Math.max(4, ...tl.lanes.map((l) => l.length));
@@ -167,8 +181,6 @@ export const ERROR = "#D64545";
 const MONO = "JetBrains Mono, Consolas, Menlo, monospace";
 const mono: Attrs = { "font-family": MONO, "font-size": 12 };
 
-const pillWidth = (label: string): number => label.length * 6.3 + 12;
-
 /** Renders frame `i` of the set as a `<g class="frame">`. */
 export function renderFrame(
   set: FrameSet,
@@ -197,8 +209,9 @@ export function renderFrame(
       "fill-opacity": 0.08,
     }),
   );
+  const axis = set.axisLabel ?? (set.hasTime ? "now" : "step");
   out.push(
-    text(L.x0 - 8, L.laneY0 - 24, set.hasTime ? "now" : "step", {
+    text(L.x0 - 8, L.laneY0 - 24, axis, {
       ...mono,
       "font-size": 10.5,
       "text-anchor": "end",
@@ -207,7 +220,7 @@ export function renderFrame(
   );
   for (let c = 0; c <= tl.lastColumn; c++) {
     out.push(
-      text(colX(c), L.laneY0 - 24, set.hasTime ? `t${c}` : String(c), {
+      text(colX(c), L.laneY0 - 24, columnLabel(set, c), {
         ...mono,
         "font-size": 10.5,
         "text-anchor": "middle",
@@ -343,6 +356,13 @@ function markElem(
   fresh: boolean,
 ): SvgElem {
   const parts: SvgElem[] = [title(`step ${m.step}: ${m.detail}`)];
+  const ring = (): SvgElem =>
+    circle(x, y, r + 4, {
+      fill: "none",
+      stroke: "currentColor",
+      "stroke-width": 1.5,
+      opacity: 0.8,
+    });
   const glyph = (s: string, attrs: Attrs = {}): SvgElem =>
     text(x, y + 5, s, {
       ...mono,
@@ -353,15 +373,7 @@ function markElem(
     });
   switch (m.kind) {
     case "value": {
-      if (fresh)
-        parts.push(
-          circle(x, y, r + 4, {
-            fill: "none",
-            stroke: "currentColor",
-            "stroke-width": 1.5,
-            opacity: 0.8,
-          }),
-        );
+      if (fresh) parts.push(ring());
       const shown = m.label.length <= 5 ? m.label : `${m.label.slice(0, 4)}…`;
       const size = shown.length <= 2 ? 11 : shown.length <= 3 ? 9.5 : 8;
       parts.push(circle(x, y, r, { fill: ACCENT }));
@@ -378,7 +390,7 @@ function markElem(
     }
     case "state": {
       const w = pillWidth(m.label);
-      if (fresh)
+      if (fresh) {
         parts.push(
           rect(x - w / 2 - 3, y - 12, w + 6, 24, {
             rx: 12,
@@ -388,6 +400,7 @@ function markElem(
             opacity: 0.8,
           }),
         );
+      }
       parts.push(rect(x - w / 2, y - 9, w, 18, { rx: 9, fill: MODEL }));
       parts.push(
         text(x, y + 3.5, m.label, {
@@ -401,51 +414,19 @@ function markElem(
       break;
     }
     case "complete":
-      if (fresh)
-        parts.push(
-          circle(x, y, r + 4, {
-            fill: "none",
-            stroke: "currentColor",
-            "stroke-width": 1.5,
-            opacity: 0.8,
-          }),
-        );
+      if (fresh) parts.push(ring());
       parts.push(rect(x - 1.5, y - r, 3, 2 * r, { fill: "currentColor" }));
       break;
     case "error":
-      if (fresh)
-        parts.push(
-          circle(x, y, r + 4, {
-            fill: "none",
-            stroke: "currentColor",
-            "stroke-width": 1.5,
-            opacity: 0.8,
-          }),
-        );
+      if (fresh) parts.push(ring());
       parts.push(glyph("#", { fill: ERROR }));
       break;
     case "subscribe":
-      if (fresh)
-        parts.push(
-          circle(x, y, r + 4, {
-            fill: "none",
-            stroke: "currentColor",
-            "stroke-width": 1.5,
-            opacity: 0.8,
-          }),
-        );
+      if (fresh) parts.push(ring());
       parts.push(glyph("^", { "font-size": 20 }));
       break;
     case "unsubscribe":
-      if (fresh)
-        parts.push(
-          circle(x, y, r + 4, {
-            fill: "none",
-            stroke: "currentColor",
-            "stroke-width": 1.5,
-            opacity: 0.8,
-          }),
-        );
+      if (fresh) parts.push(ring());
       parts.push(glyph("!", { "font-size": 18 }));
       break;
   }

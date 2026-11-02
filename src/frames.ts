@@ -52,6 +52,10 @@ export interface FrameSet {
   readonly loopStart: number | null;
   /** Lanes in display order: the order of the spec's variables. */
   readonly lanes: readonly Lane[];
+  /** Labels for the time columns, such as `10ms`; the column index otherwise. */
+  readonly columnLabels?: readonly string[];
+  /** Name of the time axis; `now` or `step` otherwise. */
+  readonly axisLabel?: string;
 }
 
 type State = Readonly<Record<string, JsValue>>;

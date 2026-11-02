@@ -1,0 +1,97 @@
+{
+  "cfg": "Share_leak_demo.cfg",
+  "module": "Share",
+  "status": "invariant-violation",
+  "violation": {
+    "name": "SourceStopsWhenUnused",
+    "loopStart": null
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "Init",
+      "state": {
+        "buffer": [],
+        "conn": {
+          "s1": 0,
+          "s2": 0,
+          "s3": 0
+        },
+        "sub": {
+          "s1": "idle",
+          "s2": "idle",
+          "s3": "idle"
+        },
+        "received": {
+          "s1": [],
+          "s2": [],
+          "s3": []
+        },
+        "connections": 0,
+        "srcSent": [],
+        "subject": "none"
+      }
+    },
+    {
+      "index": 1,
+      "action": "Subscribe",
+      "state": {
+        "buffer": [],
+        "conn": {
+          "s1": 1,
+          "s2": 0,
+          "s3": 0
+        },
+        "sub": {
+          "s1": "on",
+          "s2": "idle",
+          "s3": "idle"
+        },
+        "received": {
+          "s1": [],
+          "s2": [],
+          "s3": []
+        },
+        "connections": 1,
+        "srcSent": [],
+        "subject": "live"
+      }
+    },
+    {
+      "index": 2,
+      "action": "Unsubscribe",
+      "state": {
+        "buffer": [],
+        "conn": {
+          "s1": 1,
+          "s2": 0,
+          "s3": 0
+        },
+        "sub": {
+          "s1": "off",
+          "s2": "idle",
+          "s3": "idle"
+        },
+        "received": {
+          "s1": [],
+          "s2": [],
+          "s3": []
+        },
+        "connections": 1,
+        "srcSent": [],
+        "subject": "live"
+      }
+    }
+  ],
+  "variables": [
+    "sub",
+    "received",
+    "conn",
+    "subject",
+    "buffer",
+    "srcSent",
+    "connections"
+  ],
+  "family": "multicasting",
+  "note": "demo: shareReplay keeps the source running after the last subscription leaves"
+}

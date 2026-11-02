@@ -1,0 +1,121 @@
+{
+  "cfg": "Flatten_bug_mergeForSwitch.cfg",
+  "module": "Flatten",
+  "status": "invariant-violation",
+  "violation": {
+    "name": "NoInterleaving",
+    "loopStart": null
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "Init",
+      "state": {
+        "outDone": "active",
+        "inner": [],
+        "outerDone": "active",
+        "out": [],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 1,
+      "action": "OuterNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 0
+          }
+        ],
+        "outerDone": "active",
+        "out": [],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 2,
+      "action": "OuterNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 0
+          },
+          {
+            "state": "active",
+            "sent": 0
+          }
+        ],
+        "outerDone": "active",
+        "out": [],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 3,
+      "action": "InnerNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 0
+          },
+          {
+            "state": "active",
+            "sent": 1
+          }
+        ],
+        "outerDone": "active",
+        "out": [
+          [
+            2,
+            1
+          ]
+        ],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 4,
+      "action": "InnerNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 1
+          },
+          {
+            "state": "active",
+            "sent": 1
+          }
+        ],
+        "outerDone": "active",
+        "out": [
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "subscribed": true
+      }
+    }
+  ],
+  "variables": [
+    "outerDone",
+    "inner",
+    "out",
+    "outDone",
+    "subscribed"
+  ],
+  "family": "flattening",
+  "note": "bug demo: mergeMap where switchMap was intended"
+}

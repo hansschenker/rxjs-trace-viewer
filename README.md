@@ -12,9 +12,62 @@ most of the parts already exist in sibling repositories.
 - Published copy as a Claude artifact (private link): https://claude.ai/code/artifact/cd46e489-ca69-4f56-9dcc-03461be6889e
 - The same content in Markdown: this file
 
-This repository is also where the prototype will live: an **RxJS Trace Viewer**
-built on the one-frame-per-state idea, starting with milestone M1, SVG frames
-over tla-ts traces.
+This repository is also where the prototype lives: an **RxJS Trace Viewer**
+built on the one-frame-per-state idea. Milestone M1, SVG frames over tla-ts
+traces, is in `src/`; see [Prototype](#prototype).
+
+## Prototype
+
+Milestone M1 runs on Node 24 with no build step (Node strips the types
+itself). It needs a checkout of
+[rxjs-operator-tla](https://github.com/hansschenker/rxjs-operator-tla) next
+to this repository, or `--specs <dir>` pointing at its `specs` folder.
+
+```bash
+npm install
+npm run animate                                   # the four bug demos
+npm run animate -- Take.cfg Pipeline.cfg          # any configs from the manifest
+npm run animate -- --specs ../rxjs-operator-tla/specs
+npm test && npm run typecheck
+```
+
+`animate` checks each config with tla-ts, writes the counterexample to
+`traces/<cfg>.json`, folds it into one `FrameState` per state, renders one
+SVG frame per state, and writes a playback page to `out/<cfg>.html`. Open
+the page in a browser: Prev / Next, ← →, Home / End, Space to play, or
+click a step in the list. `trace` and `render` run the two halves alone.
+
+| File | Role |
+|---|---|
+| `src/trace.ts` | `runTrace`: tla-ts `check()` to a `TraceFile`, states as plain JavaScript, VARIABLES in declaration order |
+| `src/frames.ts` | `FrameState` and the model adapter `fromTlaTrace` |
+| `src/view.ts` | the View: `buildTimeline`, `layoutFor`, `renderFrame` |
+| `src/svg.ts` | `SvgElem` records and `serialize`, after `SVGElem` and `SVGElemToString` in Animation.tla |
+| `src/animate.ts` | the playback page, after `template.html` |
+| `src/cli.ts` | `trace`, `render`, `animate` |
+| `traces/` | the four demo counterexamples, committed as fixtures |
+| `out/` | the four generated animations |
+
+How a frame is built from a state, by the conventions of the specs:
+
+- A sequence variable that only ever grows by appending is a stream lane,
+  with `<name>Done` as its status. A sliding buffer is not append-only and
+  stays in the panel.
+- A function to append-only sequences, such as `received[s]`, is one lane
+  per key; `sub[s]` puts subscribe (`^`) and unsubscribe (`!`) on that lane.
+- A sequence of records, such as Flatten's `inner`, is one lane per element;
+  a pill shows the element's new `state`, or the fields that moved
+  (`sent=1`).
+- Every other variable is printed verbatim in the panel and highlighted in
+  the step that changed it.
+- A liveness counterexample shows where the trace loops.
+- The lane order is the spec's VARIABLES order; the column is the step, or
+  `now` when the spec has logical time.
+
+Known limits of M1: frames are pre-rendered as hidden groups, which suits
+counterexamples but not long runtime traces; tla-ts reports an action
+without its arguments, so a step says `InnerNext` rather than
+`InnerNext(1)`, and the ring on the lane that moved stands in for it.
 
 > **Verdict.** A trace is a sequence of states. A view is a pure function from a
 > state to a picture. An animation is one frame per state. That is the entire idea

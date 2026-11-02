@@ -1,0 +1,112 @@
+{
+  "cfg": "Flatten_stall_concat.cfg",
+  "module": "Flatten",
+  "status": "liveness-violation",
+  "violation": {
+    "name": "PendingInnersEventuallyRun",
+    "loopStart": 4
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "Init",
+      "state": {
+        "outDone": "active",
+        "inner": [],
+        "outerDone": "active",
+        "out": [],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 1,
+      "action": "OuterNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 0
+          }
+        ],
+        "outerDone": "active",
+        "out": [],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 2,
+      "action": "OuterNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 0
+          },
+          {
+            "state": "pending",
+            "sent": 0
+          }
+        ],
+        "outerDone": "active",
+        "out": [],
+        "subscribed": true
+      }
+    },
+    {
+      "index": 3,
+      "action": "OuterComplete",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 0
+          },
+          {
+            "state": "pending",
+            "sent": 0
+          }
+        ],
+        "outerDone": "complete",
+        "out": [],
+        "subscribed": false
+      }
+    },
+    {
+      "index": 4,
+      "action": "InnerNext",
+      "state": {
+        "outDone": "active",
+        "inner": [
+          {
+            "state": "active",
+            "sent": 1
+          },
+          {
+            "state": "pending",
+            "sent": 0
+          }
+        ],
+        "outerDone": "complete",
+        "out": [
+          [
+            1,
+            1
+          ]
+        ],
+        "subscribed": false
+      }
+    }
+  ],
+  "variables": [
+    "outerDone",
+    "inner",
+    "out",
+    "outDone",
+    "subscribed"
+  ],
+  "family": "flattening",
+  "note": "liveness demo: concatMap stalls behind an inner that never completes"
+}

@@ -1,0 +1,126 @@
+{
+  "cfg": "CombineLatest_SilentB.cfg",
+  "module": "CombineLatest",
+  "status": "liveness-violation",
+  "violation": {
+    "name": "EventuallyTerminal",
+    "loopStart": 5
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "Init",
+      "state": {
+        "out": [],
+        "aDone": "active",
+        "a": [],
+        "b": [],
+        "outDone": "active",
+        "bDone": "active"
+      }
+    },
+    {
+      "index": 1,
+      "action": "ANext",
+      "state": {
+        "out": [],
+        "aDone": "active",
+        "a": [
+          "x"
+        ],
+        "b": [],
+        "outDone": "active",
+        "bDone": "active"
+      }
+    },
+    {
+      "index": 2,
+      "action": "ANext",
+      "state": {
+        "out": [],
+        "aDone": "active",
+        "a": [
+          "x",
+          "x"
+        ],
+        "b": [],
+        "outDone": "active",
+        "bDone": "active"
+      }
+    },
+    {
+      "index": 3,
+      "action": "AComplete",
+      "state": {
+        "out": [],
+        "aDone": "complete",
+        "a": [
+          "x",
+          "x"
+        ],
+        "b": [],
+        "outDone": "active",
+        "bDone": "active"
+      }
+    },
+    {
+      "index": 4,
+      "action": "BNext",
+      "state": {
+        "out": [
+          [
+            "x",
+            "x"
+          ]
+        ],
+        "aDone": "complete",
+        "a": [
+          "x",
+          "x"
+        ],
+        "b": [
+          "x"
+        ],
+        "outDone": "active",
+        "bDone": "active"
+      }
+    },
+    {
+      "index": 5,
+      "action": "BNext",
+      "state": {
+        "out": [
+          [
+            "x",
+            "x"
+          ],
+          [
+            "x",
+            "x"
+          ]
+        ],
+        "aDone": "complete",
+        "a": [
+          "x",
+          "x"
+        ],
+        "b": [
+          "x",
+          "x"
+        ],
+        "outDone": "active",
+        "bDone": "active"
+      }
+    }
+  ],
+  "variables": [
+    "a",
+    "aDone",
+    "b",
+    "bDone",
+    "out",
+    "outDone"
+  ],
+  "family": "combining",
+  "note": "liveness demo: hangs when source B is not fair"
+}

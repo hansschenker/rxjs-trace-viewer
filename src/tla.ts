@@ -11,3 +11,16 @@ export type {
   TraceStepJs,
   TraceViolation,
 } from "./trace-file.ts";
+
+export type { Choice, Exploration, ExploreOptions, State } from "./explore.ts";
+export {
+  constantsOf,
+  describeChange,
+  startExploration,
+  takeChoice,
+  toTla,
+  toTraceFile,
+  undoChoice,
+} from "./explore.ts";
+export type { ExploreIo } from "./explore-cli.ts";
+export { exploreInteractively } from "./explore-cli.ts";

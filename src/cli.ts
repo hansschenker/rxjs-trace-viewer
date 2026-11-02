@@ -9,6 +9,7 @@ import {
 } from "./animate.ts";
 import { parseArgs, type Options } from "./cli-args.ts";
 import type { ExecutionTrace } from "./execution-trace.ts";
+import { exploreInteractively } from "./explore-cli.ts";
 import { renderExecutionTrace, renderTrace } from "./render.ts";
 import { runTrace, traceStem } from "./trace.ts";
 import type { TraceFile } from "./trace-file.ts";
@@ -150,6 +151,9 @@ async function main(): Promise<void> {
       break;
     case "gallery":
       gallery(o);
+      break;
+    case "explore":
+      await exploreInteractively(o.specs, o.names[0], o.out);
       break;
   }
 }

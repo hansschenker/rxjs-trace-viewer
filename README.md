@@ -16,7 +16,8 @@ most of the parts already exist in sibling repositories.
 This repository is also where the prototype lives: an **RxJS Trace Viewer**
 built on the one-frame-per-state idea. Milestones M1 (SVG frames over
 tla-ts traces), M2 (the package), M3 (the runtime adapter), M4 (the
-components) and M5 (model beside runtime) are done; see
+components), M5 (model beside runtime) and M6 (interactive exploration) are
+done; see
 [Prototype](#prototype). The gallery of every animation, model and runtime,
 is `out/gallery.html`.
 
@@ -176,6 +177,20 @@ The result lane is `out` or `sink` unless the pair names it, which the
 share pair does (`received[s1]` beside `s1`). `traces/pairs.json` lists the
 four pairs. The wrappers are `TracePair` in rxjs-ds and `RTracePair` in
 rxjs-vitepress-ds.
+
+### Interactive exploration
+
+`npm run explore -- Flatten_bug_mergeForSwitch.cfg` starts at the spec's
+initial state, lists the enabled actions with what each changes, and lets
+you pick one; after every choice `out/explore-<cfg>.html` is written again,
+so the browser shows the trace explored so far. `u` undoes, `q` quits.
+
+tla-ts has no stepping API, so the successors of a state are enumerated by
+model checking a generated wrapper: it pins the state as the initial state
+and declares the invariant "the state is one already seen"; every violation
+is a new successor with its action name, and the loop ends when the next
+violation lies more than one step away. The API is `startExploration`,
+`takeChoice`, `undoChoice` and `toTraceFile` in `rxjs-trace-viewer/tla`.
 
 ## What the Animation module does
 

@@ -19,6 +19,7 @@ export const COMMANDS = [
   "animate",
   "render-runtime",
   "gallery",
+  "explore",
 ] as const;
 export type Command = (typeof COMMANDS)[number];
 

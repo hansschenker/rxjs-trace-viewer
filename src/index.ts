@@ -123,3 +123,6 @@ export {
   mountPairedViewer,
   outputLane,
 } from "./pair.ts";
+
+export type { PairPanel } from "./gallery-pair.ts";
+export { renderPairFragment } from "./gallery-pair.ts";

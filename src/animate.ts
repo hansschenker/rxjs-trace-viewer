@@ -1,3 +1,5 @@
+import type { PairPanel } from "./gallery-pair.ts";
+import { renderPairFragment } from "./gallery-pair.ts";
 import { escapeText, serialize, type SvgElem } from "./svg.ts";
 
 /*
@@ -25,6 +27,8 @@ export interface GalleryItem {
   /** Tabs are grouped under this heading, in order of first appearance. */
   readonly group?: string;
   readonly page: AnimationPage;
+  /** When set, a paired panel: the model beside this page, through the alignment. */
+  readonly pair?: PairPanel;
 }
 
 export interface GalleryPage {
@@ -70,6 +74,10 @@ export const ANIMATION_CSS = `
   .gallery-group { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--anim-muted); margin-left: 8px; }
   .gallery-group:first-child { margin-left: 0; }
   .gallery-tab.current { background: var(--anim-accent); border-color: var(--anim-accent); color: #fff; }
+  .anim-pair-stages { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  @media (max-width: 900px) { .anim-pair-stages { grid-template-columns: 1fr; } }
+  .anim-pane-title { font-family: ${MONO}; font-size: 12px; font-weight: 700; color: var(--anim-muted); margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .anim-pane-action { font-family: ${MONO}; font-size: 12.5px; color: var(--anim-muted); margin: 6px 0 0; }
 `;
 
 /** Runs every `.anim` and `[data-gallery]` on the page. Include once per page. */
@@ -78,7 +86,10 @@ export const ANIMATION_SCRIPT = `
   const init = (root) => {
     const data = JSON.parse(root.querySelector("script.anim-data").textContent);
     const STEPS = data.steps;
-    const frames = Array.from(root.querySelectorAll("svg.anim-stage > g.frame"));
+    const stages = Array.from(root.querySelectorAll("svg.anim-stage"));
+    const frames = Array.from(stages[stages.length - 1].querySelectorAll("g.frame"));
+    const modelFrames = stages.length > 1 ? Array.from(stages[0].querySelectorAll("g.frame")) : [];
+    const alignment = data.alignment || null;
     const items = Array.from(root.querySelectorAll(".anim-steps button"));
     const q = (c) => root.querySelector(c);
     const slider = q(".anim-slider");
@@ -90,6 +101,12 @@ export const ANIMATION_SCRIPT = `
     const show = (n) => {
       i = Math.min(Math.max(n, 0), frames.length - 1);
       frames.forEach((g, k) => g.setAttribute("visibility", k === i ? "visible" : "hidden"));
+      if (alignment) {
+        const m = alignment[i];
+        modelFrames.forEach((g, k) => g.setAttribute("visibility", k === m ? "visible" : "hidden"));
+        const pane = root.querySelector(".anim-pane-action");
+        if (pane) pane.textContent = "model frame " + m + " · " + data.modelSteps[m];
+      }
       items.forEach((b, k) => b.classList.toggle("current", k === i));
       slider.value = String(i);
       counter.textContent = "frame " + i + " of " + (frames.length - 1);
@@ -245,7 +262,11 @@ function galleryBody(g: GalleryPage): string {
       ? ""
       : `<p class="gallery-intro">${escapeText(g.intro)}</p>`;
   const panels = g.items
-    .map((it) => renderAnimationFragment(it.page, it.id, { heading: true }))
+    .map((it) =>
+      it.pair === undefined
+        ? renderAnimationFragment(it.page, it.id, { heading: true })
+        : renderPairFragment(it.page, it.pair, it.id, { heading: true }),
+    )
     .join("\n");
   return `<div class="page gallery" data-gallery>
   <h1>${escapeText(g.title)}</h1>

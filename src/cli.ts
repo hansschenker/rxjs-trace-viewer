@@ -8,11 +8,23 @@ import {
   type GalleryItem,
 } from "./animate.ts";
 import { parseArgs, type Options } from "./cli-args.ts";
+import { fromTlaTrace } from "./frames.ts";
+import { alignByOutput } from "./pair.ts";
+import { fromExecutionTrace } from "./runtime.ts";
 import type { ExecutionTrace } from "./execution-trace.ts";
 import { exploreInteractively } from "./explore-cli.ts";
 import { renderExecutionTrace, renderTrace } from "./render.ts";
 import { runTrace, traceStem } from "./trace.ts";
 import type { TraceFile } from "./trace-file.ts";
+
+interface Pair {
+  readonly id: string;
+  readonly title: string;
+  readonly model: string;
+  readonly runtime: string;
+  readonly modelLane?: string;
+  readonly runtimeLane?: string;
+}
 
 /*
  * Usage:
@@ -95,7 +107,7 @@ function gallery(o: Options): void {
   const items: GalleryItem[] = [];
   for (const f of jsonFiles(o.traces)) {
     const file = readJson<TraceFile>(path.join(o.traces, f));
-    if (file.steps.length === 0) continue;
+    if (!Array.isArray(file.steps) || file.steps.length === 0) continue;
     const stem = f.replace(/\.json$/, "");
     items.push({
       id: `model-${stem}`,
@@ -114,6 +126,35 @@ function gallery(o: Options): void {
   }
   if (items.length === 0)
     throw new Error("nothing to show: no traces or recordings found");
+  const pairsFile = path.join(o.traces, "pairs.json");
+  if (fs.existsSync(pairsFile)) {
+    for (const pair of readJson<Pair[]>(pairsFile)) {
+      const modelFile = path.join(o.traces, `${pair.model}.json`);
+      const runtimeFile = path.join(o.runtime, `${pair.runtime}.json`);
+      if (!fs.existsSync(modelFile) || !fs.existsSync(runtimeFile)) continue;
+      const file = readJson<TraceFile>(modelFile);
+      const recording = readJson<ExecutionTrace>(runtimeFile);
+      const model = renderTrace(file, { title: pair.model }).page;
+      const runtime = renderExecutionTrace(recording, {
+        title: pair.runtime,
+      }).page;
+      const alignment = alignByOutput(
+        fromTlaTrace(file),
+        fromExecutionTrace(recording),
+        pair,
+      );
+      items.push({
+        id: `pair-${pair.id}`,
+        group: "Model beside runtime",
+        page: {
+          ...runtime,
+          title: pair.title,
+          subtitle: `${pair.model} beside ${pair.runtime} · the model shows the last state with no more result deliveries than the runtime`,
+        },
+        pair: { model, alignment },
+      });
+    }
+  }
   const page = {
     title: "RxJS Trace Viewer",
     intro:

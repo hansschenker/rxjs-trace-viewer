@@ -12,6 +12,10 @@ most of the parts already exist in sibling repositories.
 - Published copy as a Claude artifact (private link): https://claude.ai/code/artifact/cd46e489-ca69-4f56-9dcc-03461be6889e
 - The same content in Markdown: this file
 
+This repository is also where the prototype will live: an **RxJS Trace Viewer**
+built on the one-frame-per-state idea, starting with roadmap step 1, SVG frames
+over tla-ts traces.
+
 > **Verdict.** A trace is a sequence of states. A view is a pure function from a
 > state to a picture. An animation is one frame per state. That is the entire idea
 > behind the Animation module, and it transfers to RxJS one to one, because the

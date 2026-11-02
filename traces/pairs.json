@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mergeMap",
+    "title": "mergeMap where switchMap was intended",
+    "model": "Flatten_bug_mergeForSwitch",
+    "runtime": "mergeMap_stale_inner",
+    "modelLane": "out",
+    "runtimeLane": "sink"
+  },
+  {
+    "id": "concatMap",
+    "title": "concatMap behind an inner that never completes",
+    "model": "Flatten_stall_concat",
+    "runtime": "concatMap_stall",
+    "modelLane": "out",
+    "runtimeLane": "sink"
+  },
+  {
+    "id": "shareReplay",
+    "title": "shareReplay keeps the source running after the last subscriber leaves",
+    "model": "Share_leak_demo",
+    "runtime": "shareReplay_leak",
+    "modelLane": "received[s1]",
+    "runtimeLane": "s1"
+  },
+  {
+    "id": "combineLatest",
+    "title": "combineLatest hangs when source B never delivers",
+    "model": "CombineLatest_SilentB",
+    "runtime": "combineLatest_silentB",
+    "modelLane": "out",
+    "runtimeLane": "out"
+  }
+]

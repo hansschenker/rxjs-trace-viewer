@@ -15,8 +15,8 @@ most of the parts already exist in sibling repositories.
 
 This repository is also where the prototype lives: an **RxJS Trace Viewer**
 built on the one-frame-per-state idea. Milestones M1 (SVG frames over
-tla-ts traces), M2 (the package), M3 (the runtime adapter) and M4 (the
-components) are done; see
+tla-ts traces), M2 (the package), M3 (the runtime adapter), M4 (the
+components) and M5 (model beside runtime) are done; see
 [Prototype](#prototype). The gallery of every animation, model and runtime,
 is `out/gallery.html`.
 
@@ -163,6 +163,19 @@ components are thin wrappers:
 Both take a `trace` object or a `src` URL, and `title`, `subtitle`, `note`,
 `steps` and `interval`. `toFrameSet` accepts a trace file, a recording or a
 frame set; `traceText` supplies the default title, subtitle and note.
+
+### Model beside runtime
+
+`mountPairedViewer(container, modelSet, runtimeSet, options)` shows a spec
+counterexample and a recorded run of the same scenario side by side, from
+one player. The runtime has the finer frames, one per event, so the player
+runs over it and `alignByOutput` maps each runtime frame to a model frame:
+the last model state that has delivered no more values on the result lane,
+and reached no later lifecycle stage, than the runtime has at that frame.
+The result lane is `out` or `sink` unless the pair names it, which the
+share pair does (`received[s1]` beside `s1`). `traces/pairs.json` lists the
+four pairs. The wrappers are `TracePair` in rxjs-ds and `RTracePair` in
+rxjs-vitepress-ds.
 
 ## What the Animation module does
 

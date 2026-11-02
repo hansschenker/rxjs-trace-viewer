@@ -114,3 +114,12 @@ export {
   ensureTraceViewerStyles,
   mountTraceViewer,
 } from "./mount.ts";
+
+export type { AlignOptions, PairOptions, PairedViewerHandle } from "./pair.ts";
+export {
+  PAIR_CSS,
+  PAIR_STYLE_ID,
+  alignByOutput,
+  mountPairedViewer,
+  outputLane,
+} from "./pair.ts";

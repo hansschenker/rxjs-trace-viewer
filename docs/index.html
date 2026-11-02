@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tla-rxjs-svg</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #FBF8F9;
+    --surface: #FFFFFF;
+    --surface-2: #F3ECEF;
+    --ink: #231A1E;
+    --ink-2: #4A3C43;
+    --muted: #6E5E66;
+    --rule: #E6DADF;
+    --rule-2: #D5C6CC;
+    --accent: #C2185B;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #FBE4EC;
+    --model: #2E6F8E;
+    --model-soft: #E1EEF4;
+    --ok: #2E7D4F;
+    --warn: #A3640A;
+    --bad: #B3261E;
+    --code-bg: #F6F0F2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17121A;
+      --surface: #1F191F;
+      --surface-2: #2A2229;
+      --ink: #EFE7EB;
+      --ink-2: #D6CBD0;
+      --muted: #A8979F;
+      --rule: #3A3038;
+      --rule-2: #4C4049;
+      --accent: #F06292;
+      --accent-ink: #1A0A10;
+      --accent-soft: #3A1C29;
+      --model: #7FB7D3;
+      --model-soft: #1C2E38;
+      --ok: #6FCF97;
+      --warn: #E8B04B;
+      --bad: #F28B82;
+      --code-bg: #221B22;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17121A;
+    --surface: #1F191F;
+    --surface-2: #2A2229;
+    --ink: #EFE7EB;
+    --ink-2: #D6CBD0;
+    --muted: #A8979F;
+    --rule: #3A3038;
+    --rule-2: #4C4049;
+    --accent: #F06292;
+    --accent-ink: #1A0A10;
+    --accent-soft: #3A1C29;
+    --model: #7FB7D3;
+    --model-soft: #1C2E38;
+    --ok: #6FCF97;
+    --warn: #E8B04B;
+    --bad: #F28B82;
+    --code-bg: #221B22;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1040px; margin: 0 auto; padding: 48px 24px 96px; }
+  .prose { max-width: 68ch; }
+  h1, h2, h3 {
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-stretch: 88%;
+    line-height: 1.12;
+    text-wrap: balance;
+    margin: 0;
+  }
+  h1 { font-size: clamp(30px, 4.2vw, 44px); font-weight: 800; letter-spacing: -0.01em; }
+  h2 { font-size: 26px; font-weight: 700; margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule); }
+  h3 { font-size: 19px; font-weight: 700; margin-top: 32px; }
+  h2 + p, h3 + p { margin-top: 12px; }
+  p { margin: 0 0 1em; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  strong { font-weight: 600; }
+  code, pre, .mono {
+    font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+    font-size: 0.86em;
+  }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    padding: 16px 18px;
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: 16px 0 24px;
+  }
+  pre code { background: none; padding: 0; font-size: 14px; }
+  .eyebrow {
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  header .eyebrow { margin-bottom: 14px; }
+  .thesis {
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 20px 0 0;
+    max-width: 62ch;
+  }
+  .toc {
+    display: flex; flex-wrap: wrap; gap: 6px 18px;
+    margin: 28px 0 0; padding: 14px 0 0;
+    border-top: 1px solid var(--rule);
+    list-style: none;
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px; font-weight: 600;
+  }
+  .toc a { color: var(--ink-2); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+
+  .verdict {
+    margin: 40px 0 0;
+    border: 1px solid var(--accent);
+    border-left-width: 6px;
+    background: var(--surface);
+    padding: 20px 24px 8px;
+    max-width: 72ch;
+  }
+  .verdict .eyebrow { color: var(--accent); margin-bottom: 8px; }
+  .verdict ul { margin: 0 0 12px; padding-left: 20px; }
+  .verdict li { margin-bottom: 8px; }
+
+  ul.list { padding-left: 22px; margin: 0 0 1em; }
+  ul.list li { margin-bottom: 8px; }
+  ol.steps { padding-left: 0; margin: 16px 0 0; list-style: none; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step;
+    display: grid; grid-template-columns: 44px 1fr; gap: 0 14px;
+    padding: 14px 0; border-top: 1px solid var(--rule);
+  }
+  ol.steps li:last-child { border-bottom: 1px solid var(--rule); }
+  ol.steps li::before {
+    content: counter(step);
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-stretch: 88%; font-weight: 800; font-size: 26px; line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  ol.steps strong { display: block; font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; font-stretch: 88%; font-weight: 700; margin-bottom: 4px; }
+
+  figure { margin: 28px 0 36px; }
+  figure svg { display: block; width: 100%; height: auto; max-width: 100%; color: var(--ink); }
+  figure .frame-wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); padding: 12px; }
+  figcaption { font-size: 15px; color: var(--muted); margin-top: 10px; max-width: 72ch; line-height: 1.5; }
+  .fig-label { font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; font-weight: 700; color: var(--ink-2); margin-right: 6px; }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0 28px; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-top: 1px solid var(--rule); }
+  thead th {
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); border-top: none; border-bottom: 2px solid var(--rule-2);
+  }
+  tbody tr:last-child td { border-bottom: 1px solid var(--rule); }
+  td.k { font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; font-weight: 700; white-space: nowrap; }
+  td .mono { font-size: 13.5px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .chip {
+    display: inline-block; font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; line-height: 1.5;
+    margin-right: 6px; vertical-align: 1px;
+  }
+  .chip.ok { color: var(--ok); }
+  .chip.warn { color: var(--warn); }
+  .chip.bad { color: var(--bad); }
+  .chip.model { color: var(--model); }
+  .chip.rt { color: var(--accent); }
+
+  .video {
+    display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px;
+    border: 1px solid var(--rule); background: var(--surface); padding: 22px 24px; margin: 20px 0 28px;
+  }
+  .video dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 15px; }
+  .video dt { color: var(--muted); font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; padding-top: 2px; }
+  .video dd { margin: 0; }
+  .chapters { font-size: 14.5px; }
+  .chapters table { min-width: 0; }
+  .chapters td { padding: 5px 10px 5px 0; border: none; }
+  .chapters td.t { font-family: "JetBrains Mono", Consolas, monospace; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  @media (max-width: 720px) { .video { grid-template-columns: 1fr; } }
+
+  .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 16px 0 8px; }
+  .two-col h3 { margin-top: 0; }
+  .lane-model h3 { color: var(--model); }
+  .lane-rt h3 { color: var(--accent); }
+
+  .sources { font-size: 15px; }
+  .sources li { margin-bottom: 6px; }
+  footer { margin-top: 72px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="eyebrow">Design note &middot; 2 November 2026 &middot; hansschenker/tla-rxjs-svg</div>
+  <h1>One frame per state: adapting the TLA+ Animation module to RxJS</h1>
+  <p class="thesis">A trace is a sequence of states. A view is a pure function from a state to a picture. An animation is one frame per state. That is the entire idea behind Will Schultz's Animation module for TLA+, and it transfers to RxJS one to one, because the operator specs and runtime tracers in this account already treat an Observable as a state machine.</p>
+  <ul class="toc">
+    <li><a href="#module">The module</a></li>
+    <li><a href="#talk">The talk</a></li>
+    <li><a href="#mapping">The mapping</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#frame">Frame anatomy</a></li>
+    <li><a href="#gaps">Gaps</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ul>
+</header>
+
+<aside class="verdict">
+  <div class="eyebrow">Verdict</div>
+  <ul>
+    <li><strong>It adapts directly.</strong> The module's one real idea, state&nbsp;&rarr;&nbsp;view&nbsp;&rarr;&nbsp;frame, needs no translation; only the renderer and the playback move from TLA+ strings and jQuery to TypeScript.</li>
+    <li><strong>The model side is nearly free.</strong> tla-ts counterexamples from <code>rxjs-operator-tla</code> already carry a full state and an action name per step, which the original module had to bolt on by hand.</li>
+    <li><strong>The runtime side needs one new piece.</strong> An execution log is a list of actions, not states, so it must be folded into per-step snapshots first. That fold is <code>scan</code>.</li>
+    <li><strong>First step:</strong> an SVG frame renderer and a stepper page on top of <code>trace-to-marble.mjs</code>, animating the four bug demos in the specs manifest.</li>
+  </ul>
+</aside>
+
+<section id="module" class="prose">
+  <h2>What the Animation module does</h2>
+  <p>The module is 170 lines of TLA+. It defines SVG primitives as records of the shape <code>[name, attrs, children]</code>: <code>Line</code>, <code>Circle</code>, <code>Rect</code>, <code>Text</code> and <code>Group</code>. A user writes a <strong>View</strong>, an ordinary state expression over the spec's variables that returns one such element tree. Two wrappers, <code>AnimatedInit</code> and <code>AnimatedNext</code>, add three auxiliary variables to the spec: a running SVG string, a frame counter and an optional action name. On every step the wrapper evaluates View in the new state, serialises the tree to a string and appends it. The last state of any TLC error trace therefore contains every frame.</p>
+  <p>Playback is a static HTML template. Each frame is a top-level <code>&lt;g&gt;</code> inside one <code>&lt;svg&gt;</code>; the page shows one group at a time and hides the rest, driven by Prev and Next buttons and the arrow keys. Every frame also carries a <code>Next Action</code> text label so the viewer knows which transition produced it.</p>
+</section>
+
+<figure>
+  <div class="frame-wrap">
+  <svg viewBox="0 0 920 330" role="img" aria-label="The TLA+ Animation pipeline: a spec produces a trace of states, the View expression turns each state into an SVG group, and the HTML stepper shows one group at a time.">
+    <defs>
+      <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+    <g font-family="Archivo, Helvetica Neue, Arial, sans-serif" font-size="13" fill="currentColor">
+      <!-- inputs -->
+      <rect x="20" y="30" width="150" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <text x="95" y="52" text-anchor="middle" font-weight="700">Spec</text>
+      <text x="95" y="71" text-anchor="middle" font-size="12" opacity="0.75">Init, Next, vars</text>
+
+      <rect x="20" y="100" width="150" height="54" rx="3" fill="none" stroke="#2E6F8E" stroke-width="1.5"/>
+      <text x="95" y="122" text-anchor="middle" font-weight="700" fill="#2E6F8E">View</text>
+      <text x="95" y="141" text-anchor="middle" font-size="12" opacity="0.8">state &#8594; element tree</text>
+
+      <!-- spec -> trace -->
+      <line x1="170" y1="57" x2="246" y2="57" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <text x="208" y="48" text-anchor="middle" font-size="11.5" opacity="0.8">TLC -simulate</text>
+
+      <!-- states row -->
+      <g font-family="JetBrains Mono, Consolas, monospace" font-size="13">
+        <rect x="250" y="30" width="80" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="290" y="62" text-anchor="middle">s&#8320;</text>
+        <rect x="370" y="30" width="80" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="410" y="62" text-anchor="middle">s&#8321;</text>
+        <rect x="490" y="30" width="80" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="530" y="62" text-anchor="middle">s&#8322;</text>
+        <rect x="610" y="30" width="80" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <text x="650" y="62" text-anchor="middle">&#8230;</text>
+        <rect x="730" y="30" width="80" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="770" y="62" text-anchor="middle">s&#8345;</text>
+      </g>
+      <line x1="330" y1="57" x2="366" y2="57" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <line x1="450" y1="57" x2="486" y2="57" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <line x1="570" y1="57" x2="606" y2="57" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <line x1="690" y1="57" x2="726" y2="57" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <text x="348" y="24" text-anchor="middle" font-size="11.5" opacity="0.8">Next</text>
+      <text x="850" y="62" font-size="12" opacity="0.75">trace</text>
+
+      <!-- view applied per state -->
+      <line x1="170" y1="127" x2="236" y2="127" stroke="#2E6F8E" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <g stroke="#2E6F8E" stroke-width="1.5" marker-end="url(#arr1)">
+        <line x1="290" y1="84" x2="290" y2="166"/>
+        <line x1="410" y1="84" x2="410" y2="166"/>
+        <line x1="530" y1="84" x2="530" y2="166"/>
+        <line x1="770" y1="84" x2="770" y2="166"/>
+      </g>
+      <text x="300" y="131" font-size="11.5" fill="#2E6F8E">View(s&#8320;)</text>
+      <text x="780" y="131" font-size="11.5" fill="#2E6F8E">View(s&#8345;)</text>
+
+      <!-- frames row -->
+      <g font-family="JetBrains Mono, Consolas, monospace" font-size="12">
+        <rect x="250" y="170" width="80" height="54" rx="3" fill="#2E6F8E" fill-opacity="0.12" stroke="#2E6F8E" stroke-width="1.5"/>
+        <text x="290" y="202" text-anchor="middle">&lt;g id=0&gt;</text>
+        <rect x="370" y="170" width="80" height="54" rx="3" fill="#2E6F8E" fill-opacity="0.12" stroke="#2E6F8E" stroke-width="1.5"/>
+        <text x="410" y="202" text-anchor="middle">&lt;g id=1&gt;</text>
+        <rect x="490" y="170" width="80" height="54" rx="3" fill="#2E6F8E" fill-opacity="0.12" stroke="#2E6F8E" stroke-width="1.5"/>
+        <text x="530" y="202" text-anchor="middle">&lt;g id=2&gt;</text>
+        <rect x="610" y="170" width="80" height="54" rx="3" fill="none" stroke="#2E6F8E" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <text x="650" y="202" text-anchor="middle">&#8230;</text>
+        <rect x="730" y="170" width="80" height="54" rx="3" fill="#2E6F8E" fill-opacity="0.12" stroke="#2E6F8E" stroke-width="1.5"/>
+        <text x="770" y="202" text-anchor="middle">&lt;g id=n&gt;</text>
+      </g>
+      <text x="850" y="202" font-size="12" opacity="0.75">frames</text>
+
+      <!-- bracket and string -->
+      <polyline points="250,236 250,244 810,244 810,236" fill="none" stroke="currentColor" stroke-width="1"/>
+      <text x="530" y="262" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="12">svgAnimationString = frame&#8320; &#8728; frame&#8321; &#8728; &#8230; &#8728; frame&#8345;</text>
+      <line x1="530" y1="268" x2="530" y2="284" stroke="currentColor" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <rect x="250" y="288" width="560" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <text x="530" y="310" text-anchor="middle" font-size="12.5">template.html shows one &lt;g&gt; at a time &nbsp;&middot;&nbsp; Prev / Next &nbsp;&middot;&nbsp; &#8592; &#8594;</text>
+    </g>
+  </svg>
+  </div>
+  <figcaption><span class="fig-label">Figure 1.</span> The pipeline as shipped in 2018. The View is applied inside the next-state relation, so frames accumulate in an auxiliary string variable. The 2020 revision moved the same View into TLC's trace explorer, evaluated after the run, and that is the shape to copy.</figcaption>
+</figure>
+
+<section class="prose">
+  <p>Three facts in the code matter for the adaptation.</p>
+  <ul class="list">
+    <li><strong>The frame contract is trivial.</strong> Any sequence of top-level groups inside one SVG is an animation. The newer template does not even read ids; it takes the first-level children in order.</li>
+    <li><strong>Action names are a hack in the original.</strong> The spec author must write <code>Next /\ ActionName("MoveElevator")</code> per disjunct. TLC's trace explorer and tla-ts both report the action per step for free.</li>
+    <li><strong>The author retired the string-building design.</strong> The README calls the auxiliary-variable version obsolete twice: first for TLC's command-line trace exploration with the CommunityModules <code>SVG.tla</code>, then for tla-web, where a JavaScript TLA+ interpreter renders the View live in the browser with interactive next-action choice.</li>
+  </ul>
+</section>
+
+<section id="talk" class="prose">
+  <h2>What the talk adds</h2>
+  <p>The 2018 TLA+ Community Event talk frames the purpose precisely. Specs serve three ends: communication, learning and verification. Animation targets the first two and leaves verification alone. The two demos are the ones in this repository's examples folder, and each stands for a use case.</p>
+</section>
+<div class="video">
+  <div>
+    <dl>
+      <dt>Title</dt><dd>An Animation Module for TLA+ &ndash; William Schultz</dd>
+      <dt>Channel</dt><dd>TLA+ &ndash; The Temporal Logic of Actions</dd>
+      <dt>Published</dt><dd>25 July 2018</dd>
+      <dt>Length</dt><dd class="num">28 min 20 s</dd>
+      <dt>Link</dt><dd><a href="https://www.youtube.com/watch?v=mLF220fPrP4">youtube.com/watch?v=mLF220fPrP4</a></dd>
+    </dl>
+    <p style="margin:18px 0 0; font-size:15px;"><strong>Log Visibility</strong> shows a concept intuitively: transaction slots turning pending, committed or aborted while a visibility point advances behind the last hole. <strong>Raft</strong> communicates a subtle 70-step counterexample in which an entry replicated to a majority is still erased. The second is the use case that matches animated RxJS counterexamples.</p>
+  </div>
+  <div class="chapters">
+    <div class="eyebrow" style="margin-bottom:8px;">Chapters</div>
+    <table>
+      <tbody>
+        <tr><td class="t">0:00</td><td>Introduction: why specs, three purposes</td></tr>
+        <tr><td class="t">5:16</td><td>The module's thrust: visualisation for communication and learning</td></tr>
+        <tr><td class="t">5:35</td><td>How it works: trace &rarr; view per state &rarr; frames</td></tr>
+        <tr><td class="t">6:41</td><td>Basic structure: SVG primitives as TLA+ records</td></tr>
+        <tr><td class="t">7:13</td><td>View expression and the animated spec</td></tr>
+        <tr><td class="t">10:39</td><td>Internals: auxiliary variables, string output</td></tr>
+        <tr><td class="t">11:38</td><td>Demos: Log Visibility, then Raft majority rollback</td></tr>
+        <tr><td class="t">22:46</td><td>Conclusion and questions</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<section class="prose">
+  <p>Two remarks near the end settle design choices here. In the conclusion he lists the string-based auxiliary state as the performance problem and names two wishes: closer TLC integration and fully interactive trace exploration, choosing the next action at each state. In the questions he says that parsing the trace and rendering in JavaScript "may end up being the better approach long term". For RxJS, where the checker already runs in JavaScript, it is.</p>
+</section>
+
+<section id="mapping" class="prose">
+  <h2>The mapping onto existing work</h2>
+  <p>The TLA+ pipeline has three stages: produce a trace, obtain a state per step, render each state. The repositories in this account cover all three on two tracks, one from the formal model and one from the running program.</p>
+</section>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Stage</th><th><span class="chip model">Model</span> from the TLA+ specs</th><th><span class="chip rt">Runtime</span> from the running pipeline</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="k">Trace</td>
+      <td><span class="chip ok">exists</span> <code>rxjs-operator-tla</code>: 63 configurations over Take, Pointwise, Flatten, DebounceTime, CancelAfter, Pipeline, CombineLatest, ForkJoin, Retry, CatchError and Share, checked by tla-ts and by TLC. Thirty are deliberate bug and hazard demos whose counterexamples are the traces worth animating.</td>
+      <td><span class="chip ok">exists</span> <code>rxjs-execution-debugger</code> records an append-only <code>ExecutionEvent</code> log: subscribe, next, error, complete, unsubscribe, each with sequence, time, observable id, subscription id and parent subscription id. <code>rxjs-trace</code>, <code>rxjs-debug-trace</code> and <code>rxjs-spy</code> are alternative event sources.</td>
+    </tr>
+    <tr>
+      <td class="k">State per step</td>
+      <td><span class="chip ok">free</span> Each tla-ts <code>TraceStep</code> carries the full state and the action name. Every spec models a stream as a value sequence plus a status, per <code>RxBase.tla</code>, so the state shape is already uniform across operators.</td>
+      <td><span class="chip bad">missing</span> The log is actions, not states. A fold must reconstruct a snapshot per step: for each subscription its status, values so far, children, and any operator internals worth showing. This is the one piece the runtime track must add.</td>
+    </tr>
+    <tr>
+      <td class="k">Render</td>
+      <td><span class="chip warn">partial</span> <code>scripts/trace-to-marble.mjs</code> already parses the trace into plain JavaScript and prints ASCII marble diagrams. The SVG renderer replaces its text output.</td>
+      <td><span class="chip warn">planned</span> The <code>rxotn</code> package projects the log into lanes on one shared time axis. ARCHITECTURE.md lists "RxOTN model &rarr; text/SVG renderer" with text first, SVG next.</td>
+    </tr>
+    <tr>
+      <td class="k">Playback</td>
+      <td colspan="2"><span class="chip bad">missing</span> on both tracks. The template's stepper is a few dozen lines: a frame index, Prev and Next, arrow keys, an action label. <code>rxjs-execution-debugger</code> already has a navigation cursor over the trace that never re-executes code; the stepper is a view on that cursor.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<section id="architecture" class="prose">
+  <h2>Proposed architecture</h2>
+  <p>One frame-state type, two adapters that produce it, one renderer, one animator. The model track fills frames straight from tla-ts; the runtime track folds events into frames. Everything to the right of the frame array is shared, which is what makes a side-by-side view of model and runtime possible later.</p>
+</section>
+
+<figure>
+  <div class="frame-wrap">
+  <svg viewBox="0 0 980 390" role="img" aria-label="Two input tracks, a TLA+ model trace and a runtime execution log, each converted by an adapter into one FrameState array, which a single view function renders to SVG and a single animator plays.">
+    <defs>
+      <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+    <g font-family="Archivo, Helvetica Neue, Arial, sans-serif" font-size="13" fill="currentColor">
+      <!-- model lane -->
+      <text x="20" y="24" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#2E6F8E">MODEL</text>
+      <rect x="20" y="40" width="200" height="62" rx="3" fill="#2E6F8E" fill-opacity="0.10" stroke="#2E6F8E" stroke-width="1.5"/>
+      <text x="120" y="64" text-anchor="middle" font-weight="700">rxjs-operator-tla</text>
+      <text x="120" y="84" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11.5">Take.tla &middot; Flatten.tla &middot; Share.tla</text>
+      <line x1="220" y1="71" x2="276" y2="71" stroke="#2E6F8E" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <text x="248" y="61" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11">check()</text>
+      <rect x="280" y="40" width="200" height="62" rx="3" fill="#2E6F8E" fill-opacity="0.10" stroke="#2E6F8E" stroke-width="1.5"/>
+      <text x="380" y="64" text-anchor="middle" font-weight="700">TraceStep[]</text>
+      <text x="380" y="84" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11.5">{ action, state }</text>
+      <polyline points="480,71 530,71 530,190 576,190" fill="none" stroke="#2E6F8E" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <text x="536" y="120" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#2E6F8E">fromTlaTrace</text>
+
+      <!-- runtime lane -->
+      <text x="20" y="266" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#C2185B">RUNTIME</text>
+      <rect x="20" y="282" width="200" height="62" rx="3" fill="#C2185B" fill-opacity="0.10" stroke="#C2185B" stroke-width="1.5"/>
+      <text x="120" y="306" text-anchor="middle" font-weight="700">instrumented pipeline</text>
+      <text x="120" y="326" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11.5">trace() &middot; debug-trace &middot; spy</text>
+      <line x1="220" y1="313" x2="276" y2="313" stroke="#C2185B" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <text x="248" y="303" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11">record</text>
+      <rect x="280" y="282" width="200" height="62" rx="3" fill="#C2185B" fill-opacity="0.10" stroke="#C2185B" stroke-width="1.5"/>
+      <text x="380" y="306" text-anchor="middle" font-weight="700">ExecutionEvent[]</text>
+      <text x="380" y="326" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11.5">subscribe next error complete unsub</text>
+      <polyline points="480,313 530,313 530,230 576,230" fill="none" stroke="#C2185B" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr2)"/>
+      <text x="536" y="274" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#C2185B">fromExecutionTrace</text>
+      <text x="536" y="289" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#C2185B">= scan(fold)</text>
+
+      <!-- shared core -->
+      <rect x="580" y="170" width="150" height="80" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="655" y="204" text-anchor="middle" font-weight="700">FrameState[]</text>
+      <text x="655" y="224" text-anchor="middle" font-size="11.5" opacity="0.8">one per step</text>
+
+      <line x1="730" y1="210" x2="786" y2="210" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr2)"/>
+      <text x="758" y="200" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11">view(f)</text>
+      <rect x="790" y="170" width="170" height="80" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="875" y="198" text-anchor="middle" font-weight="700">SvgElem tree</text>
+      <text x="875" y="216" text-anchor="middle" font-size="11.5" opacity="0.8">lanes &middot; internals panel</text>
+      <text x="875" y="232" text-anchor="middle" font-size="11.5" opacity="0.8">action label</text>
+
+      <line x1="875" y1="250" x2="875" y2="296" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr2)"/>
+      <text x="884" y="278" font-family="JetBrains Mono, Consolas, monospace" font-size="11">frames[i]</text>
+      <rect x="790" y="300" width="170" height="62" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="875" y="325" text-anchor="middle" font-weight="700">Animator</text>
+      <text x="875" y="344" text-anchor="middle" font-size="11.5" opacity="0.8">prev &middot; next &middot; &#8592; &#8594; &middot; slider</text>
+
+      <!-- legend -->
+      <line x1="580" y1="372" x2="620" y2="372" stroke="currentColor" stroke-width="1.5"/>
+      <text x="628" y="376" font-size="11.5" opacity="0.85">exists</text>
+      <line x1="690" y1="372" x2="730" y2="372" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="738" y="376" font-size="11.5" opacity="0.85">to build</text>
+    </g>
+  </svg>
+  </div>
+  <figcaption><span class="fig-label">Figure 2.</span> Everything left of the frame array exists today. The model adapter is a reshaping of what trace-to-marble.mjs already does; the runtime adapter is new and is where operator-specific knowledge lives, because only the fold knows that a switchMap unsubscribe of an inner means "cancelled by a newer outer value".</figcaption>
+</figure>
+
+<section class="prose">
+  <h3>The frame-state type</h3>
+  <p>The shape copies the specs' own vocabulary so that a frame from either track looks the same to the renderer. Stream variables mirror <code>RxBase.tla</code>: an append-only value sequence plus a status.</p>
+<pre><code>interface StreamState {
+  vals: readonly unknown[];                       // delivered so far, append-only
+  status: 'active' | 'complete' | 'error';        // RxBase.tla Status
+}
+
+interface FrameState {
+  step: number;                                   // index in the trace
+  action: string;                                 // TraceStep.action, or event kind + label
+  now?: number;                                   // logical tick (spec) or ms (runtime)
+  streams: Record&lt;string, StreamState&gt;;           // in, out, inner[k], per subscription
+  subs?: Record&lt;string, 'idle' | 'on' | 'off' | 'complete' | 'error'&gt;;
+  internals?: Record&lt;string, unknown&gt;;            // buffer, pending timer, refCount, active inners
+}
+
+type SvgElem = { name: string; attrs: Record&lt;string, string&gt;; children: SvgElem[] | string };
+type View = (frame: FrameState) =&gt; SvgElem;       // pure, exactly like the TLA+ View</code></pre>
+  <p>The element record is the module's own <code>SVGElem</code>, kept on purpose. It can be serialised to a string for a static page, exactly as <code>SVGElemToString</code> does, or built as real DOM through the framework-less JSX factory used in <code>rxjs-ds</code>, where <code>&lt;g&gt;</code> and <code>&lt;rect&gt;</code> produce SVG nodes directly. The animator is itself a small RxJS pipeline: key and button events folded by <code>scan</code> into a frame index, mapped to <code>frames[i]</code>.</p>
+
+  <h3>Decisions carried over, and the ones changed</h3>
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:16px;">Kept from the module</h3>
+      <ul class="list">
+        <li>The View as a pure function of one state, composed from a handful of primitives and a grouping construct.</li>
+        <li>One frame per trace step, never interpolated. Frames are discrete because the semantics are.</li>
+        <li>An action label on every frame, now sourced from the checker or the event kind instead of hand annotations.</li>
+        <li>A stepper with keyboard control and a frame counter. It is the whole user interface and it is enough.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;">Changed for RxJS</h3>
+      <ul class="list">
+        <li>Render in TypeScript, not in TLA+ string variables. tla-ts has no Java override for serialisation, and auxiliary state bloats the state space.</li>
+        <li>One generic layout, lanes on a shared time axis, instead of hand-placed coordinates per spec. Per-operator code is confined to the internals panel.</li>
+        <li>Render the current frame on demand rather than pre-rendering every frame as a hidden group. Runtime traces can run to thousands of events.</li>
+        <li>Two sources for the same frame type, so a model trace and a runtime trace of one scenario can be played side by side.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="frame" class="prose">
+  <h2>Frame anatomy</h2>
+  <p>What a single frame should look like for the generic renderer, drawn for <code>Take.tla</code> at the step where the second value arrives. The lanes and marbles come from the stream variables; the subscription markers and counters come from the operator lane; the panel prints the spec's variables verbatim, which is what makes the picture checkable against the trace.</p>
+</section>
+
+<figure>
+  <div class="frame-wrap">
+  <svg viewBox="0 0 820 300" role="img" aria-label="A single animation frame for take(2): three lanes named source, take(2) and sink on a shared time axis, marbles a and b, a complete bar after b, subscription markers, and a panel listing the spec variables in, inDone, out, outDone and subscribed.">
+    <g font-family="JetBrains Mono, Consolas, monospace" font-size="12.5" fill="currentColor">
+      <rect x="10" y="10" width="800" height="280" rx="4" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+      <text x="24" y="36" font-weight="500">frame 4 &nbsp;&middot;&nbsp; action: SourceNext("b")</text>
+
+      <!-- time grid -->
+      <g stroke="currentColor" stroke-width="1" opacity="0.18">
+        <line x1="150" y1="82" x2="150" y2="236"/>
+        <line x1="240" y1="82" x2="240" y2="236"/>
+        <line x1="330" y1="82" x2="330" y2="236"/>
+        <line x1="420" y1="82" x2="420" y2="236"/>
+        <line x1="510" y1="82" x2="510" y2="236"/>
+        <line x1="600" y1="82" x2="600" y2="236"/>
+      </g>
+      <g font-size="11" opacity="0.7">
+        <text x="150" y="72" text-anchor="middle">t0</text>
+        <text x="240" y="72" text-anchor="middle">t1</text>
+        <text x="330" y="72" text-anchor="middle">t2</text>
+        <text x="420" y="72" text-anchor="middle">t3</text>
+        <text x="510" y="72" text-anchor="middle">t4</text>
+        <text x="600" y="72" text-anchor="middle">t5</text>
+      </g>
+
+      <!-- lanes -->
+      <g stroke="currentColor" stroke-width="1.5">
+        <line x1="140" y1="110" x2="612" y2="110"/>
+        <line x1="140" y1="160" x2="612" y2="160"/>
+        <line x1="140" y1="210" x2="612" y2="210"/>
+      </g>
+      <text x="30" y="114">source</text>
+      <text x="30" y="164">take(2)</text>
+      <text x="30" y="214">sink</text>
+
+      <!-- source marbles -->
+      <circle cx="240" cy="110" r="13" fill="#C2185B"/>
+      <text x="240" y="114.5" text-anchor="middle" fill="#FFFFFF" font-weight="500">a</text>
+      <circle cx="420" cy="110" r="13" fill="#C2185B"/>
+      <text x="420" y="114.5" text-anchor="middle" fill="#FFFFFF" font-weight="500">b</text>
+
+      <!-- operator lane: subscription markers and counters -->
+      <text x="150" y="165" text-anchor="middle" font-weight="500">^</text>
+      <text x="240" y="148" text-anchor="middle" font-size="11" opacity="0.8">1/2</text>
+      <text x="420" y="148" text-anchor="middle" font-size="11" opacity="0.8">2/2</text>
+      <text x="444" y="165" text-anchor="middle" font-weight="500">!</text>
+      <text x="470" y="177" font-size="10.5" opacity="0.7">unsubscribed upstream</text>
+
+      <!-- sink marbles and complete -->
+      <circle cx="240" cy="210" r="13" fill="#C2185B"/>
+      <text x="240" y="214.5" text-anchor="middle" fill="#FFFFFF" font-weight="500">a</text>
+      <circle cx="420" cy="210" r="13" fill="#C2185B"/>
+      <text x="420" y="214.5" text-anchor="middle" fill="#FFFFFF" font-weight="500">b</text>
+      <rect x="442" y="196" width="3" height="28" fill="currentColor"/>
+      <text x="456" y="230" font-size="10.5" opacity="0.7">complete</text>
+
+      <!-- internals panel -->
+      <rect x="640" y="82" width="162" height="150" rx="3" fill="none" stroke="#2E6F8E" stroke-width="1.5"/>
+      <text x="652" y="104" font-size="11" font-weight="500" fill="#2E6F8E" letter-spacing="1">VARIABLES</text>
+      <text x="652" y="128">in   = &lt;&lt;a, b&gt;&gt;</text>
+      <text x="652" y="148">inDone = active</text>
+      <text x="652" y="168">out  = &lt;&lt;a, b&gt;&gt;</text>
+      <text x="652" y="188">outDone = complete</text>
+      <text x="652" y="208">subscribed = FALSE</text>
+
+      <text x="24" y="272" font-size="11" opacity="0.7">time axis shared by every lane &nbsp;&middot;&nbsp; marbles from stream vals &nbsp;&middot;&nbsp; ^ subscribe &nbsp; ! unsubscribe</text>
+    </g>
+  </svg>
+  </div>
+  <figcaption><span class="fig-label">Figure 3.</span> A frame for take(2) after the second value. The same step unsubscribes upstream and completes downstream, which the spec encodes in one action; the frame shows both because it renders the state after the action, not the action itself.</figcaption>
+</figure>
+
+<section id="gaps" class="prose">
+  <h2>Gaps and cautions</h2>
+  <ul class="list">
+    <li><strong>No interactive exploration on the model track yet.</strong> tla-ts 0.0.3 exports a <code>check</code> function and a parser, with no public evaluate or single-step API, although an evaluator exists in its source. Choosing the next action at each state, the feature Schultz wished for and tla-web now has, would need that API first. The runtime track can be made interactive by driving the real operator under <code>TestScheduler</code>.</li>
+    <li><strong>Logical versus real time.</strong> Specs step a <code>now</code> tick; the runtime records milliseconds. The RxOTN model already collapses recorded times into ordered columns, which is the right discretisation for both.</li>
+    <li><strong>Higher-order operators need parent links.</strong> The event schema reserves <code>parentSubscriptionId</code> but does not yet populate it everywhere. Inner lanes under switchMap, mergeMap, concatMap and exhaustMap depend on it.</li>
+    <li><strong>Values are opaque at runtime.</strong> The export boundary serialises values to JSON; the renderer should use the same serialiser so marbles label consistently across live and exported traces.</li>
+    <li><strong>Frame count.</strong> Pre-rendering hidden groups is fine for a few hundred frames. Beyond that, keep the frame array and render one frame into a single SVG element.</li>
+  </ul>
+</section>
+
+<section id="roadmap" class="prose">
+  <h2>Roadmap</h2>
+  <p>Ordered by dependency and by how much existing code each step reuses.</p>
+  <ol class="steps">
+    <li><div><strong>SVG frames over tla-ts traces</strong>Extend <code>trace-to-marble.mjs</code> with a frame renderer and a ported stepper page. Animate the four bug demos in the specs manifest: mergeMap where switchMap was intended, the concatMap stall, the shareReplay leak and the combineLatest hang. A few hundred lines; the trace parsing already exists.</div></li>
+    <li><div><strong>Extract the frame type and the model adapter</strong>Move <code>FrameState</code>, <code>SvgElem</code> and <code>fromTlaTrace</code> into this repository as a package, with Vitest tests on the adapter against the fixture traces.</div></li>
+    <li><div><strong>Runtime adapter</strong>Write <code>fromExecutionTrace</code> as a <code>scan</code> over <code>ExecutionEvent[]</code>, reusing the lane classification from the <code>rxotn</code> package, and populate inner lanes from parent links.</div></li>
+    <li><div><strong>Animator components</strong>A framework-less JSX component for <code>rxjs-ds</code> and a matching Vue component for <code>rxjs-vitepress-ds</code>, so operator documentation pages can embed an animated counterexample.</div></li>
+    <li><div><strong>Model beside runtime</strong>Play a spec counterexample and a <code>TestScheduler</code> recording of the same scenario in two synchronised steppers. The conformance tests in <code>rxjs-operator-tla</code> already pair the two.</div></li>
+    <li><div><strong>Interactive exploration</strong>Blocked on a step or evaluate API from tla-ts for the model track; available sooner on the runtime track through the scheduler.</div></li>
+  </ol>
+</section>
+
+<section id="sources" class="prose">
+  <h2>Sources</h2>
+  <ul class="list sources">
+    <li>Will Schultz, <a href="https://github.com/will62794/tlaplus_animation">tlaplus_animation</a>: Animation.tla, the Elevator, Raft and LogVisibility examples, and the 2020 command-line workflow in new_examples/Elevator.</li>
+    <li>Will Schultz, <a href="https://www.youtube.com/watch?v=mLF220fPrP4">An Animation Module for TLA+</a>, TLA+ Community Event 2018.</li>
+    <li>CommunityModules <a href="https://github.com/tlaplus/CommunityModules/blob/master/modules/SVG.tla">SVG.tla</a>: the revised primitives with Image, Svg, SVGDoc, ring and graph layout helpers, and a Java override for serialisation.</li>
+    <li><a href="https://github.com/will62794/tla-web">tla-web / Spectacle</a>: a tree-sitter based TLA+ interpreter in JavaScript with live animation and interactive next-action choice.</li>
+    <li><a href="https://github.com/hansschenker/rxjs-operator-tla">rxjs-operator-tla</a>: operator specs, manifest of 63 configurations, trace-to-marble.mjs, conformance tests.</li>
+    <li><a href="https://github.com/hansschenker/rxjs-execution-debugger">rxjs-execution-debugger</a>: ExecutionEvent schema, navigation, replay and the RxOTN projection.</li>
+    <li><a href="https://github.com/hansschenker/rxjs-debug-trace">rxjs-debug-trace</a>, rxjs-trace and rxjs-spy: runtime event capture.</li>
+    <li><a href="https://www.npmjs.com/package/tla-ts">tla-ts</a> by Aiden Bai: the TypeScript model checker the specs run under.</li>
+  </ul>
+</section>
+
+<footer>Written on 2 November 2026 from a reading of the tlaplus_animation clone, the talk's transcript, and the repositories named above. Kept at <a href="https://github.com/hansschenker/tla-rxjs-svg">github.com/hansschenker/tla-rxjs-svg</a>.</footer>
+</div>
+</body>
+</html>

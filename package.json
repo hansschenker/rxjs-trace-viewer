@@ -1,6 +1,6 @@
 {
   "name": "rxjs-trace-viewer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "RxJS Trace Viewer: one SVG frame per state of a TLA+ trace, after Will Schultz's TLA+ Animation module",
   "type": "module",
@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
+    "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vitest": "^2.1.9"

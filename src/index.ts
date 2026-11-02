@@ -83,3 +83,34 @@ export {
 
 export type { PageText, RenderOptions, RenderedTrace } from "./render.ts";
 export { renderExecutionTrace, renderFrameSet, renderTrace } from "./render.ts";
+
+export type {
+  Player,
+  PlayerListener,
+  PlayerOptions,
+  PlayerState,
+} from "./player.ts";
+export { createPlayer } from "./player.ts";
+
+export { mountSvg, toDom } from "./dom.ts";
+
+export type { TraceInput, TraceText } from "./input.ts";
+export {
+  isExecutionTrace,
+  isFrameSet,
+  toFrameSet,
+  traceText,
+} from "./input.ts";
+
+export type {
+  FrameRenderer,
+  MountOptions,
+  TraceViewerHandle,
+} from "./mount.ts";
+export {
+  TRACE_VIEWER_CSS,
+  TRACE_VIEWER_STYLE_ID,
+  createFrameRenderer,
+  ensureTraceViewerStyles,
+  mountTraceViewer,
+} from "./mount.ts";

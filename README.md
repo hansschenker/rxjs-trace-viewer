@@ -15,7 +15,8 @@ most of the parts already exist in sibling repositories.
 
 This repository is also where the prototype lives: an **RxJS Trace Viewer**
 built on the one-frame-per-state idea. Milestones M1 (SVG frames over
-tla-ts traces), M2 (the package) and M3 (the runtime adapter) are done; see
+tla-ts traces), M2 (the package), M3 (the runtime adapter) and M4 (the
+components) are done; see
 [Prototype](#prototype). The gallery of every animation, model and runtime,
 is `out/gallery.html`.
 
@@ -140,6 +141,28 @@ without its arguments, so a step says `InnerNext` rather than
 > operator specs and runtime tracers in this account already treat an Observable
 > as a state machine. The model side is nearly free; the runtime side needs one
 > `scan` fold from events to per-step snapshots.
+
+### Components
+
+`mountTraceViewer(container, frameSet, options)` is the viewer as a DOM
+component: the controls of the playback page, with the current frame
+rendered on demand into one `<svg>` by `createFrameRenderer`, and a
+`createPlayer` state machine behind Prev, Next, Play, the slider, the step
+list and the keyboard. It is framework-less, so the two design-system
+components are thin wrappers:
+
+- `TraceViewer` in rxjs-ds, written in framework-less JSX against a small
+  DOM `jsx-runtime` (the first non-React component there; the
+  claude.ai/design sync still renders exports as React stories and cannot
+  show it).
+- `RTraceViewer` in rxjs-vitepress-ds, registered globally, so a page can
+  write `<RTraceViewer src="/traces/Flatten_bug_mergeForSwitch.json" />`.
+  Its styles remap the `--rtv-*` tokens to the VitePress theme, dark mode
+  included.
+
+Both take a `trace` object or a `src` URL, and `title`, `subtitle`, `note`,
+`steps` and `interval`. `toFrameSet` accepts a trace file, a recording or a
+frame set; `traceText` supplies the default title, subtitle and note.
 
 ## What the Animation module does
 
